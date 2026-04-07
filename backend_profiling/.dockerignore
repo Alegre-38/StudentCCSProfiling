@@ -5,6 +5,6 @@
 vendor/
 node_modules/
 storage/logs/*
-bootstrap/cache/*.php
+bootstrap/cache/
 database/database.sqlite
 README.md

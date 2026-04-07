@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-echo "Running composer"
+set -e
+
+echo "Running composer..."
 composer install --no-dev --working-dir=/var/www/html
+
+echo "Clearing old cache..."
+php artisan config:clear
+php artisan cache:clear
 
 echo "Caching config..."
 php artisan config:cache
