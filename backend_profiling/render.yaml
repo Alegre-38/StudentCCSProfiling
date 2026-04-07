@@ -9,7 +9,7 @@ services:
       - key: APP_DEBUG
         value: false
       - key: APP_KEY
-        generateValue: true
+        sync: false   # paste your key: run `php artisan key:generate --show` locally
       - key: APP_URL
         sync: false   # set this to your Render URL e.g. https://profiling-backend.onrender.com
       - key: DB_CONNECTION

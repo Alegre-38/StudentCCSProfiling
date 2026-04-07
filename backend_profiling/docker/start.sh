@@ -1,9 +1,10 @@
 #!/bin/sh
 set -e
 
-# Generate app key if not set
+# APP_KEY must be set via environment variable on Render
 if [ -z "$APP_KEY" ]; then
-  php artisan key:generate --force
+  echo "ERROR: APP_KEY environment variable is not set"
+  exit 1
 fi
 
 # Cache config and routes for production
@@ -22,7 +23,7 @@ php-fpm
 sleep 2
 
 # Verify php-fpm is running
-if [ ! -f /var/run/php-fpm.pid ] && ! pgrep -x php-fpm > /dev/null 2>&1; then
+if ! pgrep -x php-fpm > /dev/null 2>&1; then
   echo "ERROR: php-fpm failed to start"
   exit 1
 fi
