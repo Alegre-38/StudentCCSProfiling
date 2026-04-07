@@ -35,7 +35,6 @@ RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions sto
     && chown -R www-data:www-data storage bootstrap/cache
 
 # Copy configs
-COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 COPY docker/start.sh /start.sh
 RUN chmod +x /start.sh
