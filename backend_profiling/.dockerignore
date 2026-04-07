@@ -8,4 +8,3 @@ storage/logs/*
 bootstrap/cache/*.php
 database/database.sqlite
 README.md
-docker-compose.yml

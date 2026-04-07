@@ -4,14 +4,10 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     envVars:
-      - key: APP_ENV
-        value: production
-      - key: APP_DEBUG
-        value: false
       - key: APP_KEY
-        sync: false   # paste your key: run `php artisan key:generate --show` locally
+        sync: false   # run: php artisan key:generate --show
       - key: APP_URL
-        sync: false   # set this to your Render URL e.g. https://profiling-backend.onrender.com
+        sync: false   # e.g. https://profiling-backend.onrender.com
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
@@ -27,12 +23,10 @@ services:
       - key: MYSQL_ATTR_SSL_CA
         value: /etc/ssl/certs/ca-certificates.crt
       - key: FRONTEND_URL
-        sync: false   # set this to your Vercel URL e.g. https://your-app.vercel.app
+        sync: false   # e.g. https://your-app.vercel.app
       - key: SESSION_DRIVER
         value: cookie
       - key: CACHE_STORE
         value: file
       - key: QUEUE_CONNECTION
         value: sync
-      - key: LOG_CHANNEL
-        value: stderr
