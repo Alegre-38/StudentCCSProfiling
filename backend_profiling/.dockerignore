@@ -1,0 +1,11 @@
+.env
+.env.*
+.git/
+.gitignore
+vendor/
+node_modules/
+storage/logs/*
+bootstrap/cache/*.php
+database/database.sqlite
+README.md
+docker-compose.yml
