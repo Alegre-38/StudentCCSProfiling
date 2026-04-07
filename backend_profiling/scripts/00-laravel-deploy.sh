@@ -10,3 +10,6 @@ php artisan route:cache
 
 echo "Running migrations..."
 php artisan migrate --force
+
+echo "Seeding admin user..."
+php artisan db:seed --class=AdminSeeder --force

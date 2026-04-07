@@ -30,3 +30,7 @@ services:
         value: file
       - key: QUEUE_CONNECTION
         value: sync
+      - key: ADMIN_USERNAME
+        sync: false   # default: admin
+      - key: ADMIN_PASSWORD
+        sync: false   # default: Admin@1234 — change this!
