@@ -2,6 +2,9 @@ FROM richarvey/nginx-php-fpm:3.1.6
 
 COPY . .
 
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
 # Fix permissions for Laravel writable directories
 RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 
