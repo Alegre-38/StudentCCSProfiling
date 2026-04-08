@@ -31,9 +31,9 @@ services:
       - key: LOG_LEVEL
         value: warning
       - key: SESSION_DRIVER
-        value: cookie
+        value: database
       - key: CACHE_STORE
-        value: file
+        value: database
       - key: QUEUE_CONNECTION
         value: sync
       - key: ADMIN_USERNAME
