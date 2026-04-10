@@ -44,7 +44,17 @@ export default function Dashboard() {
 
   if (loading || !s) return (
     <div className="page-container">
-      <div style={{ color: '#9ca3af', padding: '3rem', textAlign: 'center' }}>Loading dashboard...</div>
+      <div className="page-header">
+        <h1 className="page-title">Dashboard Overview</h1>
+        <p className="page-subtitle">Live summary of the Student Profiling System.</p>
+      </div>
+      <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="stat-card" style={{ background: '#f5f5f5', animation: 'pulse 1.5s infinite' }}>
+            <div style={{ height: '60px', borderRadius: '8px', background: '#e5e7eb' }} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 
@@ -89,7 +99,7 @@ export default function Dashboard() {
           icon={<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>} />
       </div>
 
-      {/* Row 2 — Gender + Clearance */}
+      {/* Row 2 ï¿½ Gender + Clearance */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem', marginBottom: '1.2rem' }}>
 
         <SectionCard title="Gender Distribution">
@@ -160,7 +170,7 @@ export default function Dashboard() {
         </SectionCard>
       </div>
 
-      {/* Row 3 — Program + Year Level */}
+      {/* Row 3 ï¿½ Program + Year Level */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '1.2rem', marginBottom: '1.2rem' }}>
 
         <SectionCard title="Students by Program">
@@ -201,7 +211,7 @@ export default function Dashboard() {
         </SectionCard>
       </div>
 
-      {/* Row 4 — Enrollment + Faculty + Records */}
+      {/* Row 4 ï¿½ Enrollment + Faculty + Records */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.2rem', marginBottom: '1.2rem' }}>
 
         <SectionCard title="Enrollment Status">
@@ -262,7 +272,7 @@ export default function Dashboard() {
         </SectionCard>
       </div>
 
-      {/* Row 5 — Quick Access */}
+      {/* Row 5 ï¿½ Quick Access */}
       <SectionCard title="Quick Access">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.9rem' }}>
           {[
