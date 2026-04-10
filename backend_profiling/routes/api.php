@@ -7,6 +7,11 @@ use App\Http\Controllers\FacultyCoreController;
 use App\Http\Controllers\ComprehensiveSearchController;
 use App\Http\Controllers\AuthController;
 
+// Handle CORS preflight for all routes
+Route::options('{any}', function() {
+    return response()->json([], 204);
+})->where('any', '.*');
+
 // Auth routes (public)
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login',    [AuthController::class, 'login']);
