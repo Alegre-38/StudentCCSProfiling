@@ -204,8 +204,7 @@ function ProfileSection({ student, reload }) {
                     <option value="">Select</option>
                     {f.opts.map(o => <option key={o}>{o}</option>)}
                   </select>
-                : <input type={f.type||'text'} value={form[f.key]} onChange={e => setForm({...form,[f.key]:e.target.value})} style={inp} onFocus={focus} onBlur={blur} />
-            ) : (
+                : <input type={f.type||'text'} value={form[f.key]} onChange={e => setForm({...form,[f.key]:e.target.value})} style={inp} onFocus={focus} onBlur={blur} />            ) : (
               <div style={S.fieldValue}>{form[f.key] || '—'}</div>
             )}
           </div>

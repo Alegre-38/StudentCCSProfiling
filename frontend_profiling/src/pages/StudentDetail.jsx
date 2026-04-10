@@ -142,8 +142,7 @@ function StudentDetail() {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('academic');
-  const [showEdit, setShowEdit] = useState(false);
-  const [newAcademic, setNewAcademic] = useState({ Course_Code: '', Final_Grade: '', Term_Taken: '' });
+  const [showEdit, setShowEdit] = useState(false);  const [newAcademic, setNewAcademic] = useState({ Course_Code: '', Final_Grade: '', Term_Taken: '' });
   const [newSkill, setNewSkill] = useState({ category: '', skill: '', proficiency: '' });
   const [newActivity, setNewActivity] = useState({ type: '', name: '', date: '', contribution: '' });
   const [newDisciplinary, setNewDisciplinary] = useState({ Offense_Level: '', Date_Logged: '', Status: 'Pending' });
@@ -195,8 +194,6 @@ function StudentDetail() {
 
   return (
     <div className="page-container">
-      {showEdit && <EditStudentModal student={student} onClose={() => setShowEdit(false)} onSaved={fetchStudent} />}
-
       <button onClick={() => navigate('/students')}
         style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'transparent', border: '1px solid rgba(57,62,70,0.2)', borderRadius: '8px', padding: '0.45rem 1rem', cursor: 'pointer', color: '#393E46', fontWeight: 600, fontSize: '0.85em', marginBottom: '1.4rem', transition: 'all 0.2s' }}
         onMouseEnter={e => { e.currentTarget.style.background = '#222831'; e.currentTarget.style.color = '#EEEEEE'; e.currentTarget.style.borderColor = '#222831'; }}
@@ -204,10 +201,10 @@ function StudentDetail() {
         <IconArrow /> Back to Students
       </button>
 
-      {/* Profile Header — expanded with all details inside */}
+      {/* Profile Header ï¿½ expanded with all details inside */}
       <div style={{ background: 'linear-gradient(135deg, #222831 0%, #393E46 100%)', borderRadius: '16px', padding: '2rem', marginBottom: '1.2rem', boxShadow: '0 6px 24px rgba(34,40,49,0.18)' }}>
 
-        {/* Top row — avatar + name + GWA + buttons */}
+        {/* Top row ï¿½ avatar + name + GWA + buttons */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.2rem', marginBottom: '1.8rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
             <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#F97316', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.3em', color: 'white', flexShrink: 0 }}>
@@ -233,10 +230,6 @@ function StudentDetail() {
               <div style={{ fontSize: '0.68em', color: 'rgba(238,238,238,0.4)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>Clearance</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <button onClick={() => setShowEdit(true)}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.4)', color: '#F97316', borderRadius: '8px', padding: '0.45rem 1rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.83em' }}>
-                <IconEdit /> Edit Profile
-              </button>
               <button onClick={handleClearanceToggle}
                 style={{ background: cleared ? 'rgba(251,191,36,0.12)' : 'rgba(74,222,128,0.12)', border: `1px solid ${cleared ? '#fbbf24' : '#4ade80'}`, color: cleared ? '#fbbf24' : '#4ade80', borderRadius: '8px', padding: '0.45rem 1rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.83em' }}>
                 {cleared ? 'Revoke Clearance' : 'Approve Clearance'}
@@ -268,7 +261,7 @@ function StudentDetail() {
           ].map(([lbl, val]) => (
             <div key={lbl}>
               <div style={{ fontSize: '0.68em', color: 'rgba(238,238,238,0.35)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.2rem' }}>{lbl}</div>
-              <div style={{ fontSize: '0.88em', color: val ? '#EEEEEE' : 'rgba(238,238,238,0.2)', fontWeight: 500 }}>{val || '—'}</div>
+              <div style={{ fontSize: '0.88em', color: val ? '#EEEEEE' : 'rgba(238,238,238,0.2)', fontWeight: 500 }}>{val || 'ï¿½'}</div>
             </div>
           ))}
 
@@ -287,7 +280,7 @@ function StudentDetail() {
           ].map(([lbl, val]) => (
             <div key={lbl}>
               <div style={{ fontSize: '0.68em', color: 'rgba(238,238,238,0.35)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.2rem' }}>{lbl}</div>
-              <div style={{ fontSize: '0.88em', color: val ? '#EEEEEE' : 'rgba(238,238,238,0.2)', fontWeight: 500 }}>{val || '—'}</div>
+              <div style={{ fontSize: '0.88em', color: val ? '#EEEEEE' : 'rgba(238,238,238,0.2)', fontWeight: 500 }}>{val || 'ï¿½'}</div>
             </div>
           ))}
 
@@ -305,7 +298,7 @@ function StudentDetail() {
           ].map(([lbl, val]) => (
             <div key={lbl}>
               <div style={{ fontSize: '0.68em', color: 'rgba(238,238,238,0.35)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.2rem' }}>{lbl}</div>
-              <div style={{ fontSize: '0.88em', color: val ? '#EEEEEE' : 'rgba(238,238,238,0.2)', fontWeight: 500 }}>{val || '—'}</div>
+              <div style={{ fontSize: '0.88em', color: val ? '#EEEEEE' : 'rgba(238,238,238,0.2)', fontWeight: 500 }}>{val || 'ï¿½'}</div>
             </div>
           ))}
 
@@ -322,7 +315,7 @@ function StudentDetail() {
           ].map(([lbl, val]) => (
             <div key={lbl}>
               <div style={{ fontSize: '0.68em', color: 'rgba(238,238,238,0.35)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.2rem' }}>{lbl}</div>
-              <div style={{ fontSize: '0.88em', color: val ? '#EEEEEE' : 'rgba(238,238,238,0.2)', fontWeight: 500 }}>{val || '—'}</div>
+              <div style={{ fontSize: '0.88em', color: val ? '#EEEEEE' : 'rgba(238,238,238,0.2)', fontWeight: 500 }}>{val || 'ï¿½'}</div>
             </div>
           ))}
         </div>
