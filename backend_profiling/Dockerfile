@@ -7,7 +7,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Fix permissions for Laravel writable directories
 RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
-
 # Image config
 ENV SKIP_COMPOSER 1
 ENV WEBROOT /var/www/html/public
