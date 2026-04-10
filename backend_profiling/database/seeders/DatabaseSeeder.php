@@ -38,49 +38,6 @@ class DatabaseSeeder extends Seeder
         }
 
         // 4. Create Students and their associated records
-        $students = \App\Models\Student::factory(40)->create();
-
-        foreach ($students as $student) {
-            // Add Skills
-            for ($i = 0; $i < rand(1, 3); $i++) {
-                \App\Models\Skill::factory()->create([
-                    'Student_ID' => $student->Student_ID,
-                    'Skill_Category_ID' => $skillCategories->random()->Category_ID
-                ]);
-            }
-
-            // Add Sports (optional)
-            if (rand(1, 100) > 40) {
-                for ($i = 0; $i < rand(1, 2); $i++) {
-                    \App\Models\Sport::factory()->create([
-                        'Student_ID' => $student->Student_ID,
-                        'Sport_Type_ID' => $sportTypes->random()->Sport_Type_ID
-                    ]);
-                }
-            }
-
-            // Add Certificates
-            for ($i = 0; $i < rand(0, 3); $i++) {
-                \App\Models\Certificate::factory()->create([
-                    'Student_ID' => $student->Student_ID
-                ]);
-            }
-
-            // Add Violations (optional)
-            if (rand(1, 100) > 80) {
-                \App\Models\Violation::factory()->create([
-                    'Student_ID' => $student->Student_ID
-                ]);
-            }
-
-            // Add Organization Memberships
-            $joinedOrgs = $organizations->random(rand(1, 3));
-            foreach ($joinedOrgs as $org) {
-                \App\Models\StudentOrganization::factory()->create([
-                    'Student_ID' => $student->Student_ID,
-                    'Organization_ID' => $org->Organization_ID
-                ]);
-            }
-        }
+        $this->call(StudentSeeder::class);
     }
 }

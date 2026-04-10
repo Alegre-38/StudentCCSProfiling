@@ -80,7 +80,8 @@ function StudentsList() {
 
   return (
     <div className="page-container">
-      {deleteTarget && <DeleteConfirm student={deleteTarget} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />}
+      {deleteTarget && <DeleteConfirm student={deleteTarget} 
+      onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />}
       {/* Header */}
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.8rem', flexWrap:'wrap', gap:'1rem'}}>
         <div>

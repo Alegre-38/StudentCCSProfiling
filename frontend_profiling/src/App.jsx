@@ -12,6 +12,7 @@ import ComprehensiveSearch from './pages/ComprehensiveSearch';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminRegister from './pages/AdminRegister';
+import StudentPortal from './pages/StudentPortal';
 import './App.css';
 
 // SVG Icons
@@ -168,8 +169,43 @@ function AppRoutes() {
     <Routes>
       <Route path="/login"    element={user ? <Navigate to="/" replace /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register />} />
-      <Route path="/*"        element={<ProtectedLayout />} />
+      <Route path="/*"        element={
+        user?.role === 'Student'
+          ? <StudentLayout />
+          : <ProtectedLayout />
+      } />
     </Routes>
+  );
+}
+
+function StudentLayout() {
+  const { user, logout } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+
+  const initials = user.username ? user.username.slice(0, 2).toUpperCase() : 'ST';
+
+  return (
+    <div style={{minHeight:'100vh', background:'#f5f6fa', fontFamily:"'Inter','Segoe UI',system-ui,sans-serif"}}>
+      {/* Simple top bar */}
+      <header style={{background:'#222831', padding:'0 1.5rem', height:'56px', display:'flex', alignItems:'center', justifyContent:'space-between', boxShadow:'0 2px 8px rgba(0,0,0,0.2)'}}>
+        <span style={{color:'#F97316', fontWeight:800, fontSize:'1.1em', letterSpacing:'-0.01em'}}>ProfileSys</span>
+        <div style={{display:'flex', alignItems:'center', gap:'0.8rem'}}>
+          <div style={{width:'30px', height:'30px', borderRadius:'50%', background:'linear-gradient(135deg,#F97316,#d9620f)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontWeight:700, fontSize:'0.75em'}}>
+            {initials}
+          </div>
+          <span style={{fontSize:'0.82em', color:'rgba(238,238,238,0.6)'}}>{user.username}</span>
+          <button onClick={logout} style={{background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', color:'rgba(238,238,238,0.7)', borderRadius:'8px', padding:'0.35rem 0.7rem', cursor:'pointer', fontSize:'0.8em', fontWeight:600}}>
+            Sign out
+          </button>
+        </div>
+      </header>
+
+      <main style={{padding:'2rem 1rem', maxWidth:'960px', margin:'0 auto'}}>
+        <Routes>
+          <Route path="/*" element={<StudentPortal />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
 
