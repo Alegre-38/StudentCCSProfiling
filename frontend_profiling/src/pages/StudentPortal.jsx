@@ -150,8 +150,7 @@ export default function StudentPortal() {
           {section === 'skills'       && <SkillsSection       student={student} reload={load} />}
           {section === 'activities'   && <ActivitiesSection   student={student} reload={load} />}
           {section === 'disciplinary' && <DisciplinarySection student={student} />}
-          {section === 'affiliations' && <AffiliationsSection student={student} />}
-        </main>
+          {section === 'affiliations' && <AffiliationsSection student={student} />}        </main>
       </div>
     </div>
   );
@@ -231,13 +230,13 @@ function ProfileSection({ student, reload }) {
 // ── Academic Section ───────────────────────────────────────────────────────
 function AcademicSection({ student, reload }) {
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ Subject_Name:'', Grade:'', Semester:'1st', School_Year:'' });
+  const [form, setForm] = useState({ Course_Code:'', Final_Grade:'', Term_Taken:'' });
   const [saving, setSaving] = useState(false);
   const items = student.academic_histories || student.academicHistories || [];
 
   const submit = async e => {
     e.preventDefault(); setSaving(true);
-    try { await axios.post(`${API}/students/${student.Student_ID}/academic`, form); setShowModal(false); reload(); setForm({ Subject_Name:'', Grade:'', Semester:'1st', School_Year:'' }); }
+    try { await axios.post(`${API}/students/${student.Student_ID}/academic`, form); setShowModal(false); reload(); setForm({ Course_Code:'', Final_Grade:'', Term_Taken:'' }); }
     catch { alert('Failed to add record.'); }
     finally { setSaving(false); }
   };
@@ -248,18 +247,13 @@ function AcademicSection({ student, reload }) {
         <span style={S.cardTitle}>Academic History</span>
         <button onClick={() => setShowModal(true)} style={S.btnPrimary}><IcoPlus /> Add Record</button>
       </div>
-      <RecordTable items={items} fields={[{label:'Subject',key:'Subject_Name'},{label:'Grade',key:'Grade'},{label:'Semester',key:'Semester'},{label:'School Year',key:'School_Year'}]} empty="No academic records yet." />
+      <RecordTable items={items} fields={[{label:'Course Code',key:'Course_Code'},{label:'Final Grade',key:'Final_Grade'},{label:'Term Taken',key:'Term_Taken'}]} empty="No academic records yet." />
       {showModal && (
         <Modal title="Add Academic Record" onClose={() => setShowModal(false)}>
           <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:'0.9rem'}}>
-            {[['Subject Name','Subject_Name','text'],['Grade','Grade','text'],['School Year','School_Year','text']].map(([l,k,t])=>(
+            {[['Course Code','Course_Code','text'],['Final Grade (1.0-5.0)','Final_Grade','number'],['Term Taken (e.g. 1st Sem 2024-2025)','Term_Taken','text']].map(([l,k,t])=>(
               <div key={k}><label style={S.fieldLabel}>{l}</label><input type={t} required value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={inp} onFocus={focus} onBlur={blur}/></div>
             ))}
-            <div><label style={S.fieldLabel}>Semester</label>
-              <select value={form.Semester} onChange={e=>setForm({...form,Semester:e.target.value})} style={inp}>
-                <option>1st</option><option>2nd</option><option>Summer</option>
-              </select>
-            </div>
             <div style={{display:'flex',gap:'0.75rem',marginTop:'0.5rem'}}>
               <button type="submit" disabled={saving} style={S.btnPrimary}>{saving?'Saving…':'Add Record'}</button>
               <button type="button" onClick={() => setShowModal(false)} style={S.btnSecondary}>Cancel</button>
@@ -274,13 +268,13 @@ function AcademicSection({ student, reload }) {
 // ── Skills Section ─────────────────────────────────────────────────────────
 function SkillsSection({ student, reload }) {
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ Skill_Name:'', Proficiency_Level:'Beginner' });
+  const [form, setForm] = useState({ Skill_Category:'Technical', Specific_Skill:'', Proficiency:'Beginner' });
   const [saving, setSaving] = useState(false);
-  const items = student.skills || [];
+  const items = student.skill_repositories || student.skills || [];
 
   const submit = async e => {
     e.preventDefault(); setSaving(true);
-    try { await axios.post(`${API}/students/${student.Student_ID}/skills`, form); setShowModal(false); reload(); setForm({ Skill_Name:'', Proficiency_Level:'Beginner' }); }
+    try { await axios.post(`${API}/students/${student.Student_ID}/skills`, form); setShowModal(false); reload(); setForm({ Skill_Category:'Technical', Specific_Skill:'', Proficiency:'Beginner' }); }
     catch { alert('Failed to add skill.'); }
     finally { setSaving(false); }
   };
@@ -291,13 +285,18 @@ function SkillsSection({ student, reload }) {
         <span style={S.cardTitle}>Skills</span>
         <button onClick={() => setShowModal(true)} style={S.btnPrimary}><IcoPlus /> Add Skill</button>
       </div>
-      <RecordTable items={items} fields={[{label:'Skill',key:'Skill_Name'},{label:'Proficiency',key:'Proficiency_Level'}]} empty="No skills recorded yet." />
+      <RecordTable items={items} fields={[{label:'Category',key:'Skill_Category'},{label:'Skill',key:'Specific_Skill'},{label:'Proficiency',key:'Proficiency'}]} empty="No skills recorded yet." />
       {showModal && (
         <Modal title="Add Skill" onClose={() => setShowModal(false)}>
           <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:'0.9rem'}}>
-            <div><label style={S.fieldLabel}>Skill Name</label><input required value={form.Skill_Name} onChange={e=>setForm({...form,Skill_Name:e.target.value})} style={inp} onFocus={focus} onBlur={blur}/></div>
+            <div><label style={S.fieldLabel}>Skill Category</label>
+              <select value={form.Skill_Category} onChange={e=>setForm({...form,Skill_Category:e.target.value})} style={inp}>
+                <option>Technical</option><option>Communication</option><option>Leadership</option><option>Creative</option><option>Other</option>
+              </select>
+            </div>
+            <div><label style={S.fieldLabel}>Specific Skill</label><input required value={form.Specific_Skill} onChange={e=>setForm({...form,Specific_Skill:e.target.value})} style={inp} onFocus={focus} onBlur={blur}/></div>
             <div><label style={S.fieldLabel}>Proficiency Level</label>
-              <select value={form.Proficiency_Level} onChange={e=>setForm({...form,Proficiency_Level:e.target.value})} style={inp}>
+              <select value={form.Proficiency} onChange={e=>setForm({...form,Proficiency:e.target.value})} style={inp}>
                 <option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Expert</option>
               </select>
             </div>
@@ -315,13 +314,13 @@ function SkillsSection({ student, reload }) {
 // ── Activities Section ─────────────────────────────────────────────────────
 function ActivitiesSection({ student, reload }) {
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ Activity_Name:'', Activity_Type:'Sports', Date:'' });
+  const [form, setForm] = useState({ Activity_Name:'', Activity_Type:'Sports', Date_Logged:'', Contribution:'' });
   const [saving, setSaving] = useState(false);
   const items = student.non_academic_histories || student.nonAcademicHistories || [];
 
   const submit = async e => {
     e.preventDefault(); setSaving(true);
-    try { await axios.post(`${API}/students/${student.Student_ID}/non-academic`, form); setShowModal(false); reload(); setForm({ Activity_Name:'', Activity_Type:'Sports', Date:'' }); }
+    try { await axios.post(`${API}/students/${student.Student_ID}/non-academic`, form); setShowModal(false); reload(); setForm({ Activity_Name:'', Activity_Type:'Sports', Date_Logged:'', Contribution:'' }); }
     catch { alert('Failed to add activity.'); }
     finally { setSaving(false); }
   };
@@ -332,7 +331,7 @@ function ActivitiesSection({ student, reload }) {
         <span style={S.cardTitle}>Non-Academic Activities</span>
         <button onClick={() => setShowModal(true)} style={S.btnPrimary}><IcoPlus /> Add Activity</button>
       </div>
-      <RecordTable items={items} fields={[{label:'Activity',key:'Activity_Name'},{label:'Type',key:'Activity_Type'},{label:'Date',key:'Date'}]} empty="No activities recorded yet." />
+      <RecordTable items={items} fields={[{label:'Activity',key:'Activity_Name'},{label:'Type',key:'Activity_Type'},{label:'Date',key:'Date_Logged'},{label:'Contribution',key:'Contribution'}]} empty="No activities recorded yet." />
       {showModal && (
         <Modal title="Add Activity" onClose={() => setShowModal(false)}>
           <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:'0.9rem'}}>
@@ -342,7 +341,8 @@ function ActivitiesSection({ student, reload }) {
                 <option>Sports</option><option>Arts</option><option>Community Service</option><option>Leadership</option><option>Other</option>
               </select>
             </div>
-            <div><label style={S.fieldLabel}>Date</label><input type="date" value={form.Date} onChange={e=>setForm({...form,Date:e.target.value})} style={inp} onFocus={focus} onBlur={blur}/></div>
+            <div><label style={S.fieldLabel}>Date</label><input type="date" value={form.Date_Logged} onChange={e=>setForm({...form,Date_Logged:e.target.value})} style={inp} onFocus={focus} onBlur={blur}/></div>
+            <div><label style={S.fieldLabel}>Contribution</label><input value={form.Contribution} onChange={e=>setForm({...form,Contribution:e.target.value})} style={inp} onFocus={focus} onBlur={blur}/></div>
             <div style={{display:'flex',gap:'0.75rem',marginTop:'0.5rem'}}>
               <button type="submit" disabled={saving} style={S.btnPrimary}>{saving?'Saving…':'Add Activity'}</button>
               <button type="button" onClick={() => setShowModal(false)} style={S.btnSecondary}>Cancel</button>
@@ -360,7 +360,7 @@ function DisciplinarySection({ student }) {
   return (
     <div style={S.card}>
       <div style={S.cardHeader}><span style={S.cardTitle}>Disciplinary Records</span></div>
-      <RecordTable items={items} fields={[{label:'Violation',key:'Violation_Type'},{label:'Status',key:'Status'},{label:'Date',key:'Date_Reported'}]} empty="No disciplinary records." />
+      <RecordTable items={items} fields={[{label:'Offense Level',key:'Offense_Level'},{label:'Status',key:'Status'},{label:'Date',key:'Date_Logged'}]} empty="No disciplinary records." />
     </div>
   );
 }
@@ -370,7 +370,7 @@ function AffiliationsSection({ student }) {
   return (
     <div style={S.card}>
       <div style={S.cardHeader}><span style={S.cardTitle}>Affiliations</span></div>
-      <RecordTable items={items} fields={[{label:'Organization',key:'Organization_Name'},{label:'Role',key:'Role'},{label:'Date Joined',key:'Date_Joined'}]} empty="No affiliations recorded." />
+      <RecordTable items={items} fields={[{label:'Organization',key:'Org_Name'},{label:'Role',key:'Role'}]} empty="No affiliations recorded." />
     </div>
   );
 }

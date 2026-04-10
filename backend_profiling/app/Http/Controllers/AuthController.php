@@ -152,7 +152,10 @@ class AuthController extends Controller
         ];
 
         if ($user->Role === 'Student') {
-            $student = \App\Models\Student::where('User_ID', $user->User_ID)->first();
+            $student = \App\Models\StudentDemographic::where('User_ID', $user->User_ID)->first();
+            if (!$student) {
+                $student = \App\Models\StudentDemographic::where('Student_ID', $user->User_ID)->first();
+            }
             $data['student_id'] = $student?->Student_ID;
         }
 
@@ -180,7 +183,11 @@ class AuthController extends Controller
 
         // If student, attach their Student_ID so frontend can load their profile
         if ($user->Role === 'Student') {
-            $student = \App\Models\Student::where('User_ID', $user->User_ID)->first();
+            $student = \App\Models\StudentDemographic::where('User_ID', $user->User_ID)->first();
+            // Fallback: some students have User_ID set to Student_ID directly
+            if (!$student) {
+                $student = \App\Models\StudentDemographic::where('Student_ID', $user->User_ID)->first();
+            }
             $data['student_id'] = $student?->Student_ID;
         }
 
