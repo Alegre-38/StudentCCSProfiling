@@ -82,7 +82,7 @@ export default function StudentPortal() {
       {sidebarOpen && <div onClick={()=>setSidebarOpen(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:99}}/>}
 
       {/* ── Sidebar ── */}
-      <aside style={{...S.sidebar, transform: sidebarOpen ? 'translateX(0)' : undefined}}>
+      <aside style={{...S.sidebar, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)'}}>
         <div style={{padding:'1.5rem 1.2rem',borderBottom:'1px solid rgba(255,255,255,0.08)'}}>
           <div style={{color:'#F97316',fontWeight:800,fontSize:'1.2em',letterSpacing:'-0.5px',marginBottom:'1.2rem'}}>ProfileSys</div>
           <div style={{display:'flex',alignItems:'center',gap:'0.8rem'}}>
@@ -114,7 +114,7 @@ export default function StudentPortal() {
       </aside>
 
       {/* ── Main ── */}
-      <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,marginLeft:'220px'}}>
+      <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0}}>
         <header style={S.topbar}>
           <button onClick={()=>setSidebarOpen(!sidebarOpen)} style={S.menuBtn}><IcoMenu/></button>
           <span style={{color:'#F97316',fontWeight:800,fontSize:'1em',letterSpacing:'-0.3px'}}>ProfileSys</span>
