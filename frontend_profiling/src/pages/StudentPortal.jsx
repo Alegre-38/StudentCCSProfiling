@@ -82,7 +82,7 @@ export default function StudentPortal() {
       {sidebarOpen && <div onClick={()=>setSidebarOpen(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:99}}/>}
 
       {/* ── Sidebar ── */}
-      <aside style={{...S.sidebar, transform: window.innerWidth < 768 && !sidebarOpen ? 'translateX(-100%)' : 'translateX(0)'}}>
+      <aside style={{...S.sidebar, transform: sidebarOpen ? 'translateX(0)' : undefined}}>
         <div style={{padding:'1.5rem 1.2rem',borderBottom:'1px solid rgba(255,255,255,0.08)'}}>
           <div style={{color:'#F97316',fontWeight:800,fontSize:'1.2em',letterSpacing:'-0.5px',marginBottom:'1.2rem'}}>ProfileSys</div>
           <div style={{display:'flex',alignItems:'center',gap:'0.8rem'}}>
@@ -114,7 +114,7 @@ export default function StudentPortal() {
       </aside>
 
       {/* ── Main ── */}
-      <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,marginLeft: window.innerWidth >= 768 ? '220px' : 0}}>
+      <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,marginLeft:'220px'}}>
         <header style={S.topbar}>
           <button onClick={()=>setSidebarOpen(!sidebarOpen)} style={S.menuBtn}><IcoMenu/></button>
           <span style={{color:'#F97316',fontWeight:800,fontSize:'1em',letterSpacing:'-0.3px'}}>ProfileSys</span>
@@ -604,8 +604,7 @@ function EmptyState({ icon, text, sub, positive }) {
 // ── Styles ─────────────────────────────────────────────────────────────────
 const S = {
   center:      { minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f2f5' },
-  sidebar:     { width:'220px', background:'#222831', display:'flex', flexDirection:'column', position:'fixed', top:0, left:0, bottom:0, zIndex:100, transition:'transform 0.25s ease' },
-  topbar:      { background:'#222831', height:'54px', display:'flex', alignItems:'center', padding:'0 1.2rem', gap:'0.75rem', boxShadow:'0 2px 12px rgba(0,0,0,0.15)', position:'sticky', top:0, zIndex:50 },
+  sidebar:     { width:'220px', background:'#222831', display:'flex', flexDirection:'column', position:'fixed', top:0, left:0, bottom:0, zIndex:100, transition:'transform 0.25s ease' },  topbar:      { background:'#222831', height:'54px', display:'flex', alignItems:'center', padding:'0 1.2rem', gap:'0.75rem', boxShadow:'0 2px 12px rgba(0,0,0,0.15)', position:'sticky', top:0, zIndex:50 },
   menuBtn:     { background:'none', border:'none', color:'#EEEEEE', cursor:'pointer', display:'flex', alignItems:'center', padding:'0.3rem', borderRadius:'6px' },
   navBtn:      { display:'flex', alignItems:'center', gap:'0.65rem', width:'100%', padding:'0.65rem 0.75rem', borderRadius:'10px', border:'none', background:'none', color:'rgba(238,238,238,0.55)', fontWeight:600, fontSize:'0.84em', cursor:'pointer', textAlign:'left', transition:'all 0.15s', marginBottom:'2px' },
   navActive:   { background:'rgba(249,115,22,0.12)', color:'#F97316' },
