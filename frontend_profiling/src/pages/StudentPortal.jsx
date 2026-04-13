@@ -168,6 +168,34 @@ export default function StudentPortal() {
   );
 }
 
+// ── Profile sub-components (defined outside to prevent re-render focus loss) ──
+function ProfileSectionBlock({title, children}) {
+  return (
+    <div style={{marginBottom:'1.5rem'}}>
+      <div style={{fontSize:'0.7em',fontWeight:700,color:'#F97316',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'0.8rem',paddingBottom:'0.4rem',borderBottom:'2px solid rgba(249,115,22,0.15)'}}>{title}</div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:'1rem'}}>{children}</div>
+    </div>
+  );
+}
+
+function ProfileField({label, value, onChange, editing, type='text', opts}) {
+  return (
+    <div>
+      <label style={S.fieldLabel}>{label}</label>
+      {editing ? (
+        opts
+          ? <select value={value} onChange={e=>onChange(e.target.value)} style={inp} onFocus={fo} onBlur={bl}>
+              <option value="">Select</option>
+              {opts.map(o=><option key={o}>{o}</option>)}
+            </select>
+          : <input type={type} value={value} onChange={e=>onChange(e.target.value)} style={inp} onFocus={fo} onBlur={bl}/>
+      ) : (
+        <div style={S.fieldValue}>{value||<span style={{color:'#d1d5db'}}>Not set</span>}</div>
+      )}
+    </div>
+  );
+}
+
 // ── Profile Section ────────────────────────────────────────────────────────
 function ProfileSection({ student, reload }) {
   const [editing, setEditing] = useState(false);
@@ -197,29 +225,6 @@ function ProfileSection({ student, reload }) {
     finally { setSaving(false); }
   };
 
-  const Section = ({title, children}) => (
-    <div style={{marginBottom:'1.5rem'}}>
-      <div style={{fontSize:'0.7em',fontWeight:700,color:'#F97316',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'0.8rem',paddingBottom:'0.4rem',borderBottom:'2px solid rgba(249,115,22,0.15)'}}>{title}</div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:'1rem'}}>{children}</div>
-    </div>
-  );
-
-  const Field = ({label, k, type='text', opts}) => (
-    <div>
-      <label style={S.fieldLabel}>{label}</label>
-      {editing ? (
-        opts
-          ? <select value={form[k]} onChange={e=>set(k,e.target.value)} style={inp} onFocus={fo} onBlur={bl}>
-              <option value="">Select</option>
-              {opts.map(o=><option key={o}>{o}</option>)}
-            </select>
-          : <input type={type} value={form[k]} onChange={e=>set(k,e.target.value)} style={inp} onFocus={fo} onBlur={bl}/>
-      ) : (
-        <div style={S.fieldValue}>{form[k]||<span style={{color:'#d1d5db'}}>Not set</span>}</div>
-      )}
-    </div>
-  );
-
   return (
     <div style={{animation:'fadeIn 0.3s ease'}}>
       {msg==='success' && <div style={{...S.alert, background:'rgba(22,163,74,0.08)',border:'1px solid rgba(22,163,74,0.2)',color:'#16a34a'}}>✓ Profile updated successfully!</div>}
@@ -240,29 +245,29 @@ function ProfileSection({ student, reload }) {
           }
         </div>
 
-        <Section title="Basic Information">
-          <Field label="First Name"   k="First_Name"/>
-          <Field label="Middle Name"  k="Middle_Name"/>
-          <Field label="Last Name"    k="Last_Name"/>
-          <Field label="Date of Birth" k="Date_of_Birth" type="date"/>
-          <Field label="Age"          k="Age" type="number"/>
-          <Field label="Gender"       k="Gender" opts={['Male','Female','Other']}/>
-          <Field label="Civil Status" k="Civil_Status" opts={['Single','Married','Widowed','Separated']}/>
-          <Field label="Nationality"  k="Nationality"/>
-          <Field label="Religion"     k="Religion"/>
-        </Section>
+        <ProfileSectionBlock title="Basic Information">
+          <ProfileField label="First Name"   value={form.First_Name}    onChange={v=>set('First_Name',v)}    editing={editing}/>
+          <ProfileField label="Middle Name"  value={form.Middle_Name}   onChange={v=>set('Middle_Name',v)}   editing={editing}/>
+          <ProfileField label="Last Name"    value={form.Last_Name}     onChange={v=>set('Last_Name',v)}     editing={editing}/>
+          <ProfileField label="Date of Birth" value={form.Date_of_Birth} onChange={v=>set('Date_of_Birth',v)} editing={editing} type="date"/>
+          <ProfileField label="Age"          value={form.Age}           onChange={v=>set('Age',v)}           editing={editing} type="number"/>
+          <ProfileField label="Gender"       value={form.Gender}        onChange={v=>set('Gender',v)}        editing={editing} opts={['Male','Female','Other']}/>
+          <ProfileField label="Civil Status" value={form.Civil_Status}  onChange={v=>set('Civil_Status',v)}  editing={editing} opts={['Single','Married','Widowed','Separated']}/>
+          <ProfileField label="Nationality"  value={form.Nationality}   onChange={v=>set('Nationality',v)}   editing={editing}/>
+          <ProfileField label="Religion"     value={form.Religion}      onChange={v=>set('Religion',v)}      editing={editing}/>
+        </ProfileSectionBlock>
 
-        <Section title="Contact Information">
-          <Field label="Email Address"  k="Email" type="email"/>
-          <Field label="Mobile Number"  k="Mobile_Number"/>
-          <Field label="Street"         k="Street"/>
-          <Field label="Barangay"       k="Barangay"/>
-          <Field label="City / Municipality" k="City"/>
-          <Field label="Province"       k="Province"/>
-          <Field label="ZIP Code"       k="ZIP_Code"/>
-        </Section>
+        <ProfileSectionBlock title="Contact Information">
+          <ProfileField label="Email Address"       value={form.Email}         onChange={v=>set('Email',v)}         editing={editing} type="email"/>
+          <ProfileField label="Mobile Number"       value={form.Mobile_Number} onChange={v=>set('Mobile_Number',v)} editing={editing}/>
+          <ProfileField label="Street"              value={form.Street}        onChange={v=>set('Street',v)}        editing={editing}/>
+          <ProfileField label="Barangay"            value={form.Barangay}      onChange={v=>set('Barangay',v)}      editing={editing}/>
+          <ProfileField label="City / Municipality" value={form.City}          onChange={v=>set('City',v)}          editing={editing}/>
+          <ProfileField label="Province"            value={form.Province}      onChange={v=>set('Province',v)}      editing={editing}/>
+          <ProfileField label="ZIP Code"            value={form.ZIP_Code}      onChange={v=>set('ZIP_Code',v)}      editing={editing}/>
+        </ProfileSectionBlock>
 
-        <Section title="Academic Information">
+        <ProfileSectionBlock title="Academic Information">
           {[
             {label:'Student ID',        value:student.Student_ID},
             {label:'Degree Program',    value:student.Degree_Program},
@@ -276,13 +281,13 @@ function ProfileSection({ student, reload }) {
               <div style={{...S.fieldValue,color:'#6b7280'}}>{f.value||'—'}</div>
             </div>
           ))}
-        </Section>
+        </ProfileSectionBlock>
 
-        <Section title="Parent / Guardian">
-          <Field label="Guardian Name"         k="Guardian_Name"/>
-          <Field label="Relationship"          k="Guardian_Relationship" opts={['Father','Mother','Sibling','Grandparent','Relative','Guardian']}/>
-          <Field label="Contact Number"        k="Guardian_Contact"/>
-          <Field label="Occupation"            k="Guardian_Occupation"/>
+        <ProfileSectionBlock title="Parent / Guardian">
+          <ProfileField label="Guardian Name"   value={form.Guardian_Name}         onChange={v=>set('Guardian_Name',v)}         editing={editing}/>
+          <ProfileField label="Relationship"    value={form.Guardian_Relationship} onChange={v=>set('Guardian_Relationship',v)} editing={editing} opts={['Father','Mother','Sibling','Grandparent','Relative','Guardian']}/>
+          <ProfileField label="Contact Number"  value={form.Guardian_Contact}      onChange={v=>set('Guardian_Contact',v)}      editing={editing}/>
+          <ProfileField label="Occupation"      value={form.Guardian_Occupation}   onChange={v=>set('Guardian_Occupation',v)}   editing={editing}/>
           <div style={{gridColumn:'1/-1'}}>
             <label style={S.fieldLabel}>Guardian Address</label>
             {editing
@@ -290,7 +295,7 @@ function ProfileSection({ student, reload }) {
               : <div style={S.fieldValue}>{form.Guardian_Address||<span style={{color:'#d1d5db'}}>Not set</span>}</div>
             }
           </div>
-        </Section>
+        </ProfileSectionBlock>
       </div>
     </div>
   );
