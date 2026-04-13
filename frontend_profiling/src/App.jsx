@@ -159,8 +159,14 @@ function AppRoutes() {
 
   if (loading) {
     return (
-      <div style={{minHeight:'100vh', background:'#222831', display:'flex', alignItems:'center', justifyContent:'center'}}>
-        <div style={{color:'#F97316', fontWeight:700, fontSize:'1.1em', fontFamily:'Inter,sans-serif'}}>Loading...</div>
+      <div style={{minHeight:'100vh', background:'#222831', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:'1.5rem', fontFamily:"'Inter','Segoe UI',system-ui,sans-serif"}}>
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        <div style={{animation:'fadeUp 0.5s ease', textAlign:'center'}}>
+          <div style={{fontSize:'2em', fontWeight:800, color:'#F97316', letterSpacing:'-1px', marginBottom:'0.3rem'}}>ProfileSys</div>
+          <div style={{fontSize:'0.82em', color:'rgba(238,238,238,0.3)', letterSpacing:'0.1em', textTransform:'uppercase'}}>Student Profiling System</div>
+        </div>
+        <div style={{width:'36px', height:'36px', border:'3px solid rgba(249,115,22,0.2)', borderTop:'3px solid #F97316', borderRadius:'50%', animation:'spin 0.8s linear infinite'}}/>
+        <div style={{fontSize:'0.78em', color:'rgba(238,238,238,0.25)', letterSpacing:'0.05em'}}>Loading your session…</div>
       </div>
     );
   }

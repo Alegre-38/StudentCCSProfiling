@@ -194,13 +194,14 @@ function StudentDetail() {
 
   return (
     <div className="page-container">
+      {showEdit && <EditStudentModal student={student} onClose={() => setShowEdit(false)} onSaved={fetchStudent} />}
+
       <button onClick={() => navigate('/students')}
         style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'transparent', border: '1px solid rgba(57,62,70,0.2)', borderRadius: '8px', padding: '0.45rem 1rem', cursor: 'pointer', color: '#393E46', fontWeight: 600, fontSize: '0.85em', marginBottom: '1.4rem', transition: 'all 0.2s' }}
         onMouseEnter={e => { e.currentTarget.style.background = '#222831'; e.currentTarget.style.color = '#EEEEEE'; e.currentTarget.style.borderColor = '#222831'; }}
         onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#393E46'; e.currentTarget.style.borderColor = 'rgba(57,62,70,0.2)'; }}>
         <IconArrow /> Back to Students
       </button>
-
       {/* Profile Header � expanded with all details inside */}
       <div style={{ background: 'linear-gradient(135deg, #222831 0%, #393E46 100%)', borderRadius: '16px', padding: '2rem', marginBottom: '1.2rem', boxShadow: '0 6px 24px rgba(34,40,49,0.18)' }}>
 
@@ -230,6 +231,10 @@ function StudentDetail() {
               <div style={{ fontSize: '0.68em', color: 'rgba(238,238,238,0.4)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>Clearance</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <button onClick={() => setShowEdit(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.4)', color: '#F97316', borderRadius: '8px', padding: '0.45rem 1rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.83em' }}>
+                <IconEdit /> Edit Profile
+              </button>
               <button onClick={handleClearanceToggle}
                 style={{ background: cleared ? 'rgba(251,191,36,0.12)' : 'rgba(74,222,128,0.12)', border: `1px solid ${cleared ? '#fbbf24' : '#4ade80'}`, color: cleared ? '#fbbf24' : '#4ade80', borderRadius: '8px', padding: '0.45rem 1rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.83em' }}>
                 {cleared ? 'Revoke Clearance' : 'Approve Clearance'}
@@ -335,14 +340,28 @@ function StudentDetail() {
           <h3 style={{ fontSize: '1.05em', fontWeight: 700, color: '#222831', margin: '0 0 1.2rem 0' }}>Academic History</h3>
           {student.academic_histories?.length > 0 ? (
             <table style={{ marginBottom: '1.5rem' }}>
-              <thead><tr><th>Term</th><th>Course Code</th><th>Final Grade</th></tr></thead>
+              <thead><tr><th>Term</th><th>Course Code</th><th>Final Grade</th><th></th></tr></thead>
               <tbody>{student.academic_histories.map(ah => (
                 <tr key={ah.Record_ID}><td>{ah.Term_Taken}</td><td>{ah.Course_Code}</td>
                   <td><span style={{ fontWeight: 700, color: Number(ah.Final_Grade) <= 3 ? '#16a34a' : '#ef4444' }}>{Number(ah.Final_Grade).toFixed(2)}</span></td>
+                  <td><button onClick={() => deleteRecord(`${API_URL}/academic/${ah.Record_ID}`)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8em', fontWeight: 600 }}>Delete</button></td>
                 </tr>
               ))}</tbody>
             </table>
           ) : <p style={{ color: '#94a3b8' }}>No academic records yet.</p>}
+          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
+            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Add Record</p>
+            <form onSubmit={handleAddAcademic} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Course Code</label><input style={inp} placeholder="CS101" value={newAcademic.Course_Code} onChange={e => setNewAcademic({ ...newAcademic, Course_Code: e.target.value })} required /></div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Final Grade</label><input style={inp} type="number" step="0.01" min="1" max="5" placeholder="1.75" value={newAcademic.Final_Grade} onChange={e => setNewAcademic({ ...newAcademic, Final_Grade: e.target.value })} required /></div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Term</label>
+                <select style={inp} value={newAcademic.Term_Taken} onChange={e => setNewAcademic({ ...newAcademic, Term_Taken: e.target.value })} required>
+                  <option value="">Select</option><option>1st Semester</option><option>2nd Semester</option><option>Summer</option>
+                </select>
+              </div>
+              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Add</button>
+            </form>
+          </div>
         </div>
       )}
 
@@ -358,6 +377,23 @@ function StudentDetail() {
               ))}
             </div>
           ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No skills recorded yet.</p>}
+          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
+            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Add Skill</p>
+            <form onSubmit={handleAddSkill} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Category</label>
+                <select style={inp} value={newSkill.category} onChange={e => setNewSkill({ ...newSkill, category: e.target.value })} required>
+                  <option value="">Select</option><option>Technical</option><option>Sports</option><option>Arts & Creative</option><option>Leadership</option><option>Communication</option><option>Academic</option><option>Other</option>
+                </select>
+              </div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Specific Skill</label><input style={inp} placeholder="e.g. Python" value={newSkill.skill} onChange={e => setNewSkill({ ...newSkill, skill: e.target.value })} required /></div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Proficiency</label>
+                <select style={inp} value={newSkill.proficiency} onChange={e => setNewSkill({ ...newSkill, proficiency: e.target.value })} required>
+                  <option value="">Select</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Expert</option>
+                </select>
+              </div>
+              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Add</button>
+            </form>
+          </div>
         </div>
       )}
 
@@ -370,13 +406,29 @@ function StudentDetail() {
                 <div key={na.Activity_ID} style={{ background: 'rgba(249,115,22,0.04)', border: '1px solid rgba(249,115,22,0.12)', borderRadius: '10px', padding: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <strong style={{ color: '#222831' }}>{na.Activity_Name}</strong>
-                    <span style={{ background: 'rgba(249,115,22,0.1)', color: '#ea580c', borderRadius: '20px', padding: '0.2rem 0.7rem', fontSize: '0.78em', fontWeight: 600 }}>{na.Activity_Type}</span>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <span style={{ background: 'rgba(249,115,22,0.1)', color: '#ea580c', borderRadius: '20px', padding: '0.2rem 0.7rem', fontSize: '0.78em', fontWeight: 600 }}>{na.Activity_Type}</span>
+                      <button onClick={() => deleteRecord(`${API_URL}/non-academic/${na.Activity_ID}`)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8em', fontWeight: 600 }}>Delete</button>
+                    </div>
                   </div>
                   <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.83em', color: '#64748b' }}>{na.Date_Logged} &mdash; {na.Contribution}</p>
                 </div>
               ))}
             </div>
           ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No activities logged yet.</p>}
+          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
+            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Log Activity</p>
+            <form onSubmit={handleLogActivity} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Activity Name</label><input style={inp} placeholder="e.g. Basketball Tournament" value={newActivity.name} onChange={e => setNewActivity({ ...newActivity, name: e.target.value })} required /></div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Type</label>
+                <select style={inp} value={newActivity.type} onChange={e => setNewActivity({ ...newActivity, type: e.target.value })} required>
+                  <option value="">Select</option><option>Sports</option><option>Cultural</option><option>Community Service</option><option>Leadership</option><option>Academic Competition</option><option>Other</option>
+                </select>
+              </div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Date</label><input style={inp} type="date" value={newActivity.date} onChange={e => setNewActivity({ ...newActivity, date: e.target.value })} required /></div>
+              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Log</button>
+            </form>
+          </div>
         </div>
       )}
 
@@ -399,6 +451,23 @@ function StudentDetail() {
               ))}
             </div>
           ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No disciplinary records. Clean record.</p>}
+          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
+            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Add Disciplinary Record</p>
+            <form onSubmit={handleAddDisciplinary} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Offense Level</label>
+                <select style={inp} value={newDisciplinary.Offense_Level} onChange={e => setNewDisciplinary({ ...newDisciplinary, Offense_Level: e.target.value })} required>
+                  <option value="">Select</option><option>Minor</option><option>Major</option><option>Severe</option>
+                </select>
+              </div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Date</label><input style={inp} type="date" value={newDisciplinary.Date_Logged} onChange={e => setNewDisciplinary({ ...newDisciplinary, Date_Logged: e.target.value })} required /></div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Status</label>
+                <select style={inp} value={newDisciplinary.Status} onChange={e => setNewDisciplinary({ ...newDisciplinary, Status: e.target.value })}>
+                  <option>Pending</option><option>Under Investigation</option><option>Resolved</option>
+                </select>
+              </div>
+              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Add</button>
+            </form>
+          </div>
         </div>
       )}
 
@@ -413,10 +482,23 @@ function StudentDetail() {
                     <strong style={{ color: '#222831' }}>{aff.Org_Name}</strong>
                     <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.83em', color: '#64748b' }}>Role: <span style={{ color: '#7c3aed', fontWeight: 600 }}>{aff.Role}</span></p>
                   </div>
+                  <button onClick={() => deleteRecord(`${API_URL}/affiliations/${aff.Affiliation_ID}`)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8em', fontWeight: 600 }}>Delete</button>
                 </div>
               ))}
             </div>
           ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No affiliations recorded yet.</p>}
+          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
+            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Add Affiliation</p>
+            <form onSubmit={handleAddAffiliation} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Organization Name</label><input style={inp} placeholder="e.g. GDSC, Basketball Varsity" value={newAffiliation.Org_Name} onChange={e => setNewAffiliation({ ...newAffiliation, Org_Name: e.target.value })} required /></div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Role</label>
+                <select style={inp} value={newAffiliation.Role} onChange={e => setNewAffiliation({ ...newAffiliation, Role: e.target.value })}>
+                  <option>Member</option><option>Officer</option><option>President</option><option>Vice President</option><option>Secretary</option><option>Treasurer</option><option>Captain</option>
+                </select>
+              </div>
+              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Add</button>
+            </form>
+          </div>
         </div>
       )}
     </div>
