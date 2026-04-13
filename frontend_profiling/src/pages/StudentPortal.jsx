@@ -73,7 +73,7 @@ export default function StudentPortal() {
 
   const cleared  = student.Med_Clearance || student.Medical_Clearance;
   const initials = ((student.First_Name?.[0]||'') + (student.Last_Name?.[0]||'')).toUpperCase();
-  const fullName = `${student.First_Name || ''} ${student.Last_Name || ''}`.trim();
+  const fullName = `${student.First_Name || ''} ${student.Middle_Name ? student.Middle_Name + ' ' : ''}${student.Last_Name || ''}`.trim();
 
   return (
     <div style={{display:'flex',minHeight:'100vh',background:'#f0f2f5',fontFamily:"'Inter','Segoe UI',system-ui,sans-serif"}}>
