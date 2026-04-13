@@ -335,27 +335,14 @@ function StudentDetail() {
           <h3 style={{ fontSize: '1.05em', fontWeight: 700, color: '#222831', margin: '0 0 1.2rem 0' }}>Academic History</h3>
           {student.academic_histories?.length > 0 ? (
             <table style={{ marginBottom: '1.5rem' }}>
-              <thead><tr><th>Term</th><th>Course Code</th><th>Final Grade</th><th></th></tr></thead>
+              <thead><tr><th>Term</th><th>Course Code</th><th>Final Grade</th></tr></thead>
               <tbody>{student.academic_histories.map(ah => (
                 <tr key={ah.Record_ID}><td>{ah.Term_Taken}</td><td>{ah.Course_Code}</td>
                   <td><span style={{ fontWeight: 700, color: Number(ah.Final_Grade) <= 3 ? '#16a34a' : '#ef4444' }}>{Number(ah.Final_Grade).toFixed(2)}</span></td>
                 </tr>
               ))}</tbody>
             </table>
-          ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No academic records yet.</p>}
-          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
-            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Add Record</p>
-            <form onSubmit={handleAddAcademic} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
-              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Course Code</label><input style={inp} placeholder="CS101" value={newAcademic.Course_Code} onChange={e => setNewAcademic({ ...newAcademic, Course_Code: e.target.value })} required /></div>
-              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Final Grade</label><input style={inp} type="number" step="0.01" min="1" max="5" placeholder="1.75" value={newAcademic.Final_Grade} onChange={e => setNewAcademic({ ...newAcademic, Final_Grade: e.target.value })} required /></div>
-              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Term</label>
-                <select style={inp} value={newAcademic.Term_Taken} onChange={e => setNewAcademic({ ...newAcademic, Term_Taken: e.target.value })} required>
-                  <option value="">Select</option><option>1st Semester</option><option>2nd Semester</option><option>Summer</option>
-                </select>
-              </div>
-              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Add</button>
-            </form>
-          </div>
+          ) : <p style={{ color: '#94a3b8' }}>No academic records yet.</p>}
         </div>
       )}
 
@@ -371,69 +358,6 @@ function StudentDetail() {
               ))}
             </div>
           ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No skills recorded yet.</p>}
-          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
-            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Add Skill</p>
-            <form onSubmit={handleAddSkill} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Category</label>
-                <select style={inp} value={newSkill.category} onChange={e => setNewSkill({ ...newSkill, category: e.target.value, skill: '' })} required>
-                  <option value="">Select Category</option>
-                  <option>Sports</option>
-                  <option>Technical / IT</option>
-                  <option>Arts & Creative</option>
-                  <option>Leadership</option>
-                  <option>Communication</option>
-                  <option>Academic</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Specific Skill</label>
-                <select style={inp} value={newSkill.skill} onChange={e => setNewSkill({ ...newSkill, skill: e.target.value })} required>
-                  <option value="">Select Skill</option>
-                  {newSkill.category === 'Sports' && <>
-                    <option>Basketball</option><option>Volleyball</option><option>Football</option>
-                    <option>Badminton</option><option>Swimming</option><option>Table Tennis</option>
-                    <option>Chess</option><option>Track & Field</option>
-                  </>}
-                  {newSkill.category === 'Technical / IT' && <>
-                    <option>Python</option><option>JavaScript</option><option>Java</option>
-                    <option>PHP</option><option>React</option><option>Laravel</option>
-                    <option>Database Management</option><option>Networking</option>
-                    <option>Web Development</option><option>Mobile Development</option>
-                  </>}
-                  {newSkill.category === 'Arts & Creative' && <>
-                    <option>Drawing</option><option>Painting</option><option>Photography</option>
-                    <option>Video Editing</option><option>Graphic Design</option>
-                    <option>Music</option><option>Dancing</option><option>Acting</option>
-                  </>}
-                  {newSkill.category === 'Leadership' && <>
-                    <option>Team Management</option><option>Event Planning</option>
-                    <option>Public Speaking</option><option>Project Management</option>
-                  </>}
-                  {newSkill.category === 'Communication' && <>
-                    <option>English Proficiency</option><option>Filipino Proficiency</option>
-                    <option>Debate</option><option>Journalism</option><option>Copywriting</option>
-                  </>}
-                  {newSkill.category === 'Academic' && <>
-                    <option>Mathematics</option><option>Research</option>
-                    <option>Statistics</option><option>Science</option>
-                  </>}
-                  {newSkill.category === 'Other' && <>
-                    <option>Cooking</option><option>First Aid</option>
-                    <option>Driving</option><option>Other</option>
-                  </>}
-                  {!newSkill.category && <option disabled>Select a category first</option>}
-                </select>
-              </div>
-              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Proficiency</label>
-                <select style={inp} value={newSkill.proficiency} onChange={e => setNewSkill({ ...newSkill, proficiency: e.target.value })} required>
-                  <option value="">Select</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option>
-                </select>
-              </div>
-              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Add</button>
-            </form>
-          </div>
         </div>
       )}
 
@@ -453,88 +377,6 @@ function StudentDetail() {
               ))}
             </div>
           ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No activities logged yet.</p>}
-          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
-            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Log Activity</p>
-            <form onSubmit={handleLogActivity} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Type</label>
-                <select style={inp} value={newActivity.type} onChange={e => setNewActivity({ ...newActivity, type: e.target.value, name: '' })} required>
-                  <option value="">Select Type</option>
-                  <option>Sports</option>
-                  <option>Cultural</option>
-                  <option>Community Service</option>
-                  <option>Leadership</option>
-                  <option>Academic Competition</option>
-                  <option>Religious</option>
-                  <option>Environmental</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Activity Name</label>
-                <select style={inp} value={newActivity.name} onChange={e => setNewActivity({ ...newActivity, name: e.target.value })} required>
-                  <option value="">Select Activity</option>
-                  {newActivity.type === 'Sports' && <>
-                    <option>Basketball Tournament</option><option>Volleyball Tournament</option>
-                    <option>Football League</option><option>Swimming Competition</option>
-                    <option>Badminton Tournament</option><option>Track & Field Meet</option>
-                    <option>Chess Tournament</option><option>Sports Fest</option>
-                  </>}
-                  {newActivity.type === 'Cultural' && <>
-                    <option>Dance Competition</option><option>Singing Contest</option>
-                    <option>Theater Play</option><option>Art Exhibit</option>
-                    <option>Cultural Festival</option><option>Talent Show</option>
-                  </>}
-                  {newActivity.type === 'Community Service' && <>
-                    <option>Outreach Program</option><option>Tree Planting</option>
-                    <option>Blood Donation Drive</option><option>Feeding Program</option>
-                    <option>Coastal Cleanup</option><option>Livelihood Training</option>
-                  </>}
-                  {newActivity.type === 'Leadership' && <>
-                    <option>Student Council</option><option>Organization Officer</option>
-                    <option>Leadership Summit</option><option>Youth Camp</option>
-                    <option>Seminar Facilitator</option>
-                  </>}
-                  {newActivity.type === 'Academic Competition' && <>
-                    <option>Programming Contest</option><option>Math Olympiad</option>
-                    <option>Science Quiz Bee</option><option>Debate Competition</option>
-                    <option>Research Presentation</option><option>Hackathon</option>
-                  </>}
-                  {newActivity.type === 'Religious' && <>
-                    <option>Retreat</option><option>Youth Ministry</option>
-                    <option>Mission Trip</option><option>Prayer Rally</option>
-                  </>}
-                  {newActivity.type === 'Environmental' && <>
-                    <option>Eco-Awareness Campaign</option><option>Recycling Drive</option>
-                    <option>Environmental Summit</option>
-                  </>}
-                  {newActivity.type === 'Other' && <>
-                    <option>Seminar / Workshop</option><option>Conference</option>
-                    <option>Volunteer Work</option><option>Other</option>
-                  </>}
-                  {!newActivity.type && <option disabled>Select a type first</option>}
-                </select>
-              </div>
-              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Date</label><input style={inp} type="date" value={newActivity.date} onChange={e => setNewActivity({ ...newActivity, date: e.target.value })} required /></div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Contribution / Award</label>
-                <select style={inp} value={newActivity.contribution} onChange={e => setNewActivity({ ...newActivity, contribution: e.target.value })} required>
-                  <option value="">Select</option>
-                  <option>Champion / 1st Place</option>
-                  <option>2nd Place</option>
-                  <option>3rd Place</option>
-                  <option>Finalist</option>
-                  <option>Participant</option>
-                  <option>Organizer</option>
-                  <option>Volunteer</option>
-                  <option>Speaker / Presenter</option>
-                  <option>Best in Category</option>
-                  <option>Special Award</option>
-                </select>
-              </div>
-              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Log</button>
-            </form>
-          </div>
         </div>
       )}
 
@@ -557,41 +399,6 @@ function StudentDetail() {
               ))}
             </div>
           ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No disciplinary records. Clean record.</p>}
-          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
-            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Add Record</p>
-            <form onSubmit={handleAddDisciplinary} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
-              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Offense Level</label>
-                <select style={inp} value={newDisciplinary.Offense_Level} onChange={e => setNewDisciplinary({ ...newDisciplinary, Offense_Level: e.target.value })} required>
-                  <option value="">Select</option>
-                  <option>Minor</option>
-                  <option>Major</option>
-                  <option>Severe</option>
-                </select>
-              </div>
-              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Violation Type</label>
-                <select style={inp} value={newDisciplinary.Violation_Type || ''} onChange={e => setNewDisciplinary({ ...newDisciplinary, Violation_Type: e.target.value })}>
-                  <option value="">Select Type</option>
-                  <option>Tardiness / Absences</option>
-                  <option>Dress Code Violation</option>
-                  <option>Cheating / Academic Dishonesty</option>
-                  <option>Bullying / Harassment</option>
-                  <option>Vandalism</option>
-                  <option>Substance Use</option>
-                  <option>Disrespect to Authority</option>
-                  <option>Fighting / Physical Altercation</option>
-                  <option>Theft</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Date</label><input style={inp} type="date" value={newDisciplinary.Date_Logged} onChange={e => setNewDisciplinary({ ...newDisciplinary, Date_Logged: e.target.value })} required /></div>
-              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Status</label>
-                <select style={inp} value={newDisciplinary.Status} onChange={e => setNewDisciplinary({ ...newDisciplinary, Status: e.target.value })}>
-                  <option>Pending</option><option>Under Investigation</option><option>Resolved</option>
-                </select>
-              </div>
-              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Add</button>
-            </form>
-          </div>
         </div>
       )}
 
@@ -610,99 +417,6 @@ function StudentDetail() {
               ))}
             </div>
           ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No affiliations recorded yet.</p>}
-          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
-            <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Add Affiliation</p>
-            <form onSubmit={handleAddAffiliation} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Organization Type</label>
-                <select style={inp} value={newAffiliation.Org_Type || ''} onChange={e => setNewAffiliation({ ...newAffiliation, Org_Type: e.target.value, Org_Name: '' })}>
-                  <option value="">Select Type</option>
-                  <option>Academic Organization</option>
-                  <option>Sports Team / Varsity</option>
-                  <option>Student Government</option>
-                  <option>Cultural / Arts Group</option>
-                  <option>Religious Organization</option>
-                  <option>Community / Civic Group</option>
-                  <option>Professional Organization</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Organization Name</label>
-                <select style={inp} value={newAffiliation.Org_Name} onChange={e => setNewAffiliation({ ...newAffiliation, Org_Name: e.target.value })} required>
-                  <option value="">Select Organization</option>
-                  {newAffiliation.Org_Type === 'Academic Organization' && <>
-                    <option>JPIA (Junior Philippine Institute of Accountants)</option>
-                    <option>GDSC (Google Developer Student Club)</option>
-                    <option>ACM Student Chapter</option>
-                    <option>IEEE Student Branch</option>
-                    <option>Math Club</option>
-                    <option>Science Club</option>
-                    <option>IT Society</option>
-                    <option>Computer Science Society</option>
-                  </>}
-                  {newAffiliation.Org_Type === 'Sports Team / Varsity' && <>
-                    <option>Basketball Varsity</option>
-                    <option>Volleyball Varsity</option>
-                    <option>Football Team</option>
-                    <option>Swimming Team</option>
-                    <option>Badminton Team</option>
-                    <option>Chess Club</option>
-                    <option>Track & Field Team</option>
-                  </>}
-                  {newAffiliation.Org_Type === 'Student Government' && <>
-                    <option>Supreme Student Government (SSG)</option>
-                    <option>College Student Council</option>
-                    <option>Department Representative</option>
-                  </>}
-                  {newAffiliation.Org_Type === 'Cultural / Arts Group' && <>
-                    <option>Dance Troupe</option>
-                    <option>Chorale / Glee Club</option>
-                    <option>Theater Arts Group</option>
-                    <option>Fine Arts Club</option>
-                    <option>Photography Club</option>
-                  </>}
-                  {newAffiliation.Org_Type === 'Religious Organization' && <>
-                    <option>Campus Ministry</option>
-                    <option>Youth for Christ</option>
-                    <option>Catholic Youth Organization</option>
-                    <option>Christian Fellowship</option>
-                  </>}
-                  {newAffiliation.Org_Type === 'Community / Civic Group' && <>
-                    <option>Red Cross Youth</option>
-                    <option>Rotaract Club</option>
-                    <option>Junior Chamber International (JCI)</option>
-                    <option>Environmental Club</option>
-                  </>}
-                  {newAffiliation.Org_Type === 'Professional Organization' && <>
-                    <option>PSITE (Philippine Society of IT Educators)</option>
-                    <option>IECEP Student Chapter</option>
-                    <option>PSME Student Chapter</option>
-                    <option>Other Professional Org</option>
-                  </>}
-                  {!newAffiliation.Org_Type && <option disabled>Select a type first</option>}
-                </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Role</label>
-                <select style={inp} value={newAffiliation.Role} onChange={e => setNewAffiliation({ ...newAffiliation, Role: e.target.value })}>
-                  <option value="">Select Role</option>
-                  <option>Member</option>
-                  <option>Officer</option>
-                  <option>President</option>
-                  <option>Vice President</option>
-                  <option>Secretary</option>
-                  <option>Treasurer</option>
-                  <option>Auditor</option>
-                  <option>Public Relations Officer</option>
-                  <option>Captain / Team Leader</option>
-                  <option>Co-Captain</option>
-                  <option>Varsity Player</option>
-                  <option>Representative</option>
-                </select>
-              </div>
-              <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Add</button>
-            </form>
-          </div>
         </div>
       )}
     </div>
