@@ -58,3 +58,15 @@ Route::get('/search/students', [ComprehensiveSearchController::class, 'search'])
 
 // Dashboard stats
 Route::get('/dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'stats']);
+
+// Student classmates (students in same section/program/year)
+Route::get('/students/{id}/classmates', function ($id) {
+    $student = \App\Models\StudentDemographic::findOrFail($id);
+    $classmates = \App\Models\StudentDemographic::where('Student_ID', '!=', $id)
+        ->where('Degree_Program', $student->Degree_Program)
+        ->where('Year_Level', $student->Year_Level)
+        ->when($student->Section, fn($q) => $q->where('Section', $student->Section))
+        ->select('Student_ID', 'First_Name', 'Last_Name', 'Degree_Program', 'Year_Level', 'Section', 'Enrollment_Status')
+        ->get();
+    return response()->json($classmates);
+});

@@ -15,7 +15,10 @@ const IcoPlus     = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="
 const IcoMenu     = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>;
 const IcoLogout   = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
 
+const IcoDash     = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
+
 const SECTIONS = [
+  { key:'dashboard',    label:'Dashboard',     Icon:IcoDash     },
   { key:'profile',      label:'My Profile',   Icon:IcoUser     },
   { key:'academic',     label:'Academic',      Icon:IcoBook     },
   { key:'skills',       label:'Skills',        Icon:IcoStar     },
@@ -47,7 +50,7 @@ export default function StudentPortal() {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
-  const [section, setSection] = useState('profile');
+  const [section, setSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const load = () => {
@@ -156,6 +159,7 @@ export default function StudentPortal() {
             </div>
           </div>
 
+          {section==='dashboard'    && <StudentDashboard    student={student}/>}
           {section==='profile'      && <ProfileSection      student={student} reload={load}/>}
           {section==='academic'     && <AcademicSection     student={student} reload={load}/>}
           {section==='skills'       && <SkillsSection       student={student} reload={load}/>}
@@ -168,8 +172,100 @@ export default function StudentPortal() {
   );
 }
 
-// ── Profile sub-components (defined outside to prevent re-render focus loss) ──
-function ProfileSectionBlock({title, children}) {
+// ── Student Dashboard ──────────────────────────────────────────────────────
+function StudentDashboard({ student }) {
+  const [classmates, setClassmates] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`${API}/students/${student.Student_ID}/classmates`)
+      .then(r => setClassmates(r.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [student.Student_ID]);
+
+  const cleared = student.Med_Clearance || student.Medical_Clearance;
+
+  return (
+    <div style={{animation:'fadeIn 0.3s ease'}}>
+      {/* Welcome card */}
+      <div style={{background:'linear-gradient(135deg,#222831,#393E46)',borderRadius:'16px',padding:'1.5rem',marginBottom:'1.2rem',boxShadow:'0 4px 20px rgba(34,40,49,0.15)'}}>
+        <div style={{fontSize:'0.75em',color:'rgba(238,238,238,0.4)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'0.3rem'}}>Welcome back</div>
+        <div style={{fontSize:'1.4em',fontWeight:800,color:'#EEEEEE',marginBottom:'0.8rem'}}>{student.First_Name} {student.Last_Name}</div>
+        <div style={{display:'flex',gap:'0.6rem',flexWrap:'wrap'}}>
+          {[
+            {label:student.Degree_Program||'No Program', color:'#F97316'},
+            {label:`Year ${student.Year_Level}`, color:'#3b82f6'},
+            {label:student.Section ? `Section ${student.Section}` : 'No Section', color:'#8b5cf6'},
+            {label:cleared?'Cleared':'Pending Clearance', color:cleared?'#16a34a':'#d97706'},
+          ].map(b=>(
+            <span key={b.label} style={{padding:'0.25rem 0.75rem',borderRadius:'20px',fontSize:'0.75em',fontWeight:600,background:`${b.color}20`,color:b.color,border:`1px solid ${b.color}40`}}>{b.label}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:'0.8rem',marginBottom:'1.2rem'}}>
+        {[
+          {label:'Academic Records', value: (student.academic_histories||[]).length, color:'#3b82f6'},
+          {label:'Skills', value: (student.skill_repositories||[]).length, color:'#10b981'},
+          {label:'Activities', value: (student.non_academic_histories||[]).length, color:'#F97316'},
+          {label:'Affiliations', value: (student.affiliations||[]).length, color:'#8b5cf6'},
+          {label:'Classmates', value: classmates.length, color:'#ec4899'},
+        ].map(s=>(
+          <div key={s.label} style={{background:'white',borderRadius:'12px',padding:'1rem',boxShadow:'0 2px 8px rgba(34,40,49,0.06)',border:'1px solid rgba(0,0,0,0.04)'}}>
+            <div style={{fontSize:'1.8em',fontWeight:800,color:s.color,lineHeight:1}}>{s.value}</div>
+            <div style={{fontSize:'0.75em',color:'#9ca3af',marginTop:'0.3rem',fontWeight:600}}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Classmates */}
+      <div style={S.card}>
+        <div style={S.cardHeader}>
+          <div>
+            <div style={S.cardTitle}>My Classmates</div>
+            <div style={{fontSize:'0.78em',color:'#9ca3af',marginTop:'2px'}}>
+              {student.Section ? `Section ${student.Section} · ` : ''}{student.Degree_Program} · Year {student.Year_Level}
+            </div>
+          </div>
+          <span style={{fontSize:'0.8em',color:'#9ca3af',fontWeight:600}}>{classmates.length} student{classmates.length!==1?'s':''}</span>
+        </div>
+
+        {loading ? (
+          <div style={{textAlign:'center',padding:'2rem',color:'#9ca3af',fontSize:'0.9em'}}>Loading classmates…</div>
+        ) : classmates.length === 0 ? (
+          <div style={{textAlign:'center',padding:'2rem'}}>
+            <div style={{fontSize:'2em',marginBottom:'0.5rem'}}>👥</div>
+            <div style={{color:'#6b7280',fontWeight:600,fontSize:'0.9em'}}>No classmates found</div>
+            <div style={{color:'#9ca3af',fontSize:'0.8em',marginTop:'0.3rem'}}>
+              {student.Section ? 'No other students in your section yet.' : 'Ask your admin to assign you a section.'}
+            </div>
+          </div>
+        ) : (
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:'0.75rem'}}>
+            {classmates.map(c => {
+              const ini = ((c.First_Name?.[0]||'')+(c.Last_Name?.[0]||'')).toUpperCase();
+              const colors = ['#F97316','#3b82f6','#10b981','#8b5cf6','#ec4899','#f59e0b'];
+              const color = colors[(c.First_Name?.charCodeAt(0)||0) % colors.length];
+              return (
+                <div key={c.Student_ID} style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.75rem',background:'#f9fafb',borderRadius:'10px',border:'1px solid #f0f0f0'}}>
+                  <div style={{width:'36px',height:'36px',borderRadius:'50%',background:`${color}20`,color,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.8em',flexShrink:0,border:`1px solid ${color}30`}}>{ini}</div>
+                  <div style={{minWidth:0}}>
+                    <div style={{fontWeight:600,color:'#222831',fontSize:'0.88em',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{c.First_Name} {c.Last_Name}</div>
+                    <div style={{fontSize:'0.72em',color:'#9ca3af'}}>{c.Degree_Program} · Yr {c.Year_Level}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Profile sub-components (defined outside to prevent re-render focus loss) ──function ProfileSectionBlock({title, children}) {
   return (
     <div style={{marginBottom:'1.5rem'}}>
       <div style={{fontSize:'0.7em',fontWeight:700,color:'#F97316',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'0.8rem',paddingBottom:'0.4rem',borderBottom:'2px solid rgba(249,115,22,0.15)'}}>{title}</div>
