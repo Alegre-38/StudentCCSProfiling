@@ -101,9 +101,9 @@ class AuthController extends Controller
                         tempPassword: $plainPassword,
                         loginUrl: $loginUrl,
                     ));
+                    \Log::info('Student account email sent to: ' . $request->email);
                 } catch (\Exception $e) {
-                    // Don't fail account creation if email fails — just log it
-                    \Log::warning('Failed to send student account email: ' . $e->getMessage());
+                    \Log::error('Failed to send student account email to ' . $request->email . ': ' . $e->getMessage());
                 }
             }
         }
@@ -119,6 +119,7 @@ class AuthController extends Controller
         // Return temp password so admin can hand it to the student
         if ($request->role === 'Student') {
             $response['temp_password'] = $plainPassword;
+            $response['email_sent'] = $request->email ? true : false;
         }
 
         return response()->json($response, 201);
