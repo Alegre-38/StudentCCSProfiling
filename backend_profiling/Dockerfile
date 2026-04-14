@@ -1,5 +1,8 @@
 FROM richarvey/nginx-php-fpm:3.1.6
 
+# Cache bust - forces fresh build when CORS or config changes
+ARG CACHE_BUST=1
+
 COPY . .
 
 # Install dependencies
