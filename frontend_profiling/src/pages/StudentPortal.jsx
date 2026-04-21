@@ -190,22 +190,6 @@ function StudentDashboard({ student }) {
 
   return (
     <div style={{animation:'fadeIn 0.3s ease'}}>
-      {/* Welcome card */}
-      <div style={{background:'linear-gradient(135deg,#222831,#393E46)',borderRadius:'16px',padding:'1.5rem',marginBottom:'1.2rem',boxShadow:'0 4px 20px rgba(34,40,49,0.15)'}}>
-        <div style={{fontSize:'0.75em',color:'rgba(238,238,238,0.4)',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'0.3rem'}}>Welcome back</div>
-        <div style={{fontSize:'1.4em',fontWeight:800,color:'#EEEEEE',marginBottom:'0.8rem'}}>{student.First_Name} {student.Last_Name}</div>
-        <div style={{display:'flex',gap:'0.6rem',flexWrap:'wrap'}}>
-          {[
-            {label:student.Degree_Program||'No Program', color:'#F97316'},
-            {label:`Year ${student.Year_Level}`, color:'#3b82f6'},
-            {label:student.Section ? `Section ${student.Section}` : 'No Section', color:'#8b5cf6'},
-            {label:cleared?'Cleared':'Pending Clearance', color:cleared?'#16a34a':'#d97706'},
-          ].map(b=>(
-            <span key={b.label} style={{padding:'0.25rem 0.75rem',borderRadius:'20px',fontSize:'0.75em',fontWeight:600,background:`${b.color}20`,color:b.color,border:`1px solid ${b.color}40`}}>{b.label}</span>
-          ))}
-        </div>
-      </div>
-
       {/* Stats row */}
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:'0.8rem',marginBottom:'1.2rem'}}>
         {[
