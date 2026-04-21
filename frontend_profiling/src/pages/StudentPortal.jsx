@@ -265,7 +265,8 @@ function StudentDashboard({ student }) {
   );
 }
 
-// ── Profile sub-components (defined outside to prevent re-render focus loss) ──function ProfileSectionBlock({title, children}) {
+// ── Profile sub-components (defined outside to prevent re-render focus loss) ──
+function ProfileSectionBlock({title, children}) {
   return (
     <div style={{marginBottom:'1.5rem'}}>
       <div style={{fontSize:'0.7em',fontWeight:700,color:'#F97316',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'0.8rem',paddingBottom:'0.4rem',borderBottom:'2px solid rgba(249,115,22,0.15)'}}>{title}</div>
