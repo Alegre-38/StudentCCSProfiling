@@ -74,7 +74,7 @@ function RegisterStudent() {
   const fullRow = { gridColumn:'1 / -1' };
 
   const sections = [
-    // Step 0 — Personal
+    // Step 0 ï¿½ Personal
     <div key="personal" style={{display:'flex', flexDirection:'column', gap:'1rem'}}>
       <div style={{display:'grid', gridTemplateColumns:'repeat(3, minmax(0, 1fr))', gap:'1rem'}}>
         {field('Last Name', 'Last_Name', formData, handleChange, {required:true})}
@@ -91,7 +91,7 @@ function RegisterStudent() {
       </div>
     </div>,
 
-    // Step 1 — Contact
+    // Step 1 ï¿½ Contact
     <div key="contact" style={sectionStyle}>
       {field('Email Address', 'Email', formData, handleChange, {type:'email', required:true})}
       {field('Mobile Number', 'Mobile_Number', formData, handleChange, {placeholder:'09XXXXXXXXX'})}
@@ -102,17 +102,27 @@ function RegisterStudent() {
       {field('ZIP Code', 'ZIP_Code', formData, handleChange)}
     </div>,
 
-    // Step 2 — Academic
+    // Step 2 ï¿½ Academic
     <div key="academic" style={sectionStyle}>
       {field('Student ID', 'Student_ID', formData, handleChange, {required:true, placeholder:'2024-XXXX'})}
       {field('Year Level', 'Year_Level', formData, handleChange, {type:'select', required:true, options:[1,2,3,4,5].map(n=>({v:String(n),l:`Year ${n}`}))})}
-      <div style={fullRow}>{field('Course / Degree Program', 'Degree_Program', formData, handleChange, {required:true, type:'select', options:[{v:'',l:'Select Program'},{v:'BS Information Technology',l:'BS Information Technology'},{v:'BS Computer Science',l:'BS Computer Science'},{v:'BS Information Systems',l:'BS Information Systems'},{v:'BS Mathematics',l:'BS Mathematics'}]})}</div>
-      {field('Section', 'Section', formData, handleChange, {placeholder:'e.g. BSIT-3A'})}
+      <div style={fullRow}>{field('Course / Degree Program', 'Degree_Program', formData, handleChange, {required:true, type:'select', options:[{v:'',l:'Select Program'},{v:'BS Information Technology',l:'BS Information Technology'},{v:'BS Computer Science',l:'BS Computer Science'}]})}</div>
+      {field('Section', 'Section', formData, handleChange, {type:'select', options:[
+        {v:'',l:'Select Section'},
+        ...['A','B','C','D','E'].map(l => {
+          const prog = formData.Degree_Program.includes('Information Technology') ? 'BSIT'
+            : formData.Degree_Program.includes('Computer Science') ? 'BSCS'
+            : formData.Degree_Program.includes('Information Systems') ? 'BSIS'
+            : 'BS';
+          const val = `${prog}-${formData.Year_Level}${l}`;
+          return {v: val, l: val};
+        })
+      ]})}
       {field('School Year', 'School_Year', formData, handleChange, {placeholder:'e.g. 2024-2025'})}
       <div style={fullRow}>{field('Enrollment Status', 'Enrollment_Status', formData, handleChange, {type:'select', required:true, options:[{v:'New',l:'New'},{v:'Transferee',l:'Transferee'},{v:'Returning',l:'Returning'}]})}</div>
     </div>,
 
-    // Step 3 — Guardian
+    // Step 3 ï¿½ Guardian
     <div key="guardian" style={sectionStyle}>
       {field('Parent / Guardian Name', 'Guardian_Name', formData, handleChange)}
       {field('Relationship to Student', 'Guardian_Relationship', formData, handleChange, {type:'select', options:[{v:'',l:'Select'},{v:'Parent',l:'Parent'},{v:'Guardian',l:'Guardian'},{v:'Sibling',l:'Sibling'},{v:'Relative',l:'Relative'},{v:'Other',l:'Other'}]})}

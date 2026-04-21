@@ -8,7 +8,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 function AdminRegister() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ username: '', password: '', password_confirmation: '', role: 'Faculty', first_name: '', last_name: '', email: '', degree_program: 'BS CS', year_level: 1 });
+  const [form, setForm] = useState({ username: '', password: '', password_confirmation: '', role: 'Faculty', first_name: '', last_name: '', email: '', degree_program: 'BS CS', year_level: 1, section: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [createdCreds, setCreatedCreds] = useState(null);
@@ -43,7 +43,7 @@ function AdminRegister() {
       } else {
         setSuccess(`Account created: ${res.data.user.username} (${res.data.user.role})`);
       }
-      setForm({ username: '', password: '', password_confirmation: '', role: form.role, first_name: '', last_name: '', email: '', degree_program: 'BS CS', year_level: 1 });
+      setForm({ username: '', password: '', password_confirmation: '', role: form.role, first_name: '', last_name: '', email: '', degree_program: 'BS CS', year_level: 1, section: '' });
     } catch (err) {
       const msg = err.response?.data?.message
         || Object.values(err.response?.data?.errors || {})[0]?.[0]
@@ -164,6 +164,17 @@ function AdminRegister() {
                     </div>
                   </div>
 
+                  <div>
+                    <label style={labelStyle}>Section</label>
+                    <select name="section" value={form.section||''} onChange={handleChange} style={{...inputStyle, cursor:'pointer'}} onFocus={focusIn} onBlur={focusOut}>
+                      <option value="">Select Section</option>
+                      {['A','B','C','D','E'].map(l => {
+                        const prog = form.degree_program === 'BS IT' ? 'BSIT' : 'BSCS';
+                        const val = `${prog}-${form.year_level}${l}`;
+                        return <option key={l} value={val}>{val}</option>;
+                      })}
+                    </select>
+                  </div>
                   <div style={{display:'flex', gap:'0.6rem', padding:'0.8rem 1rem', borderRadius:'10px', background:'rgba(52,211,153,0.06)', border:'1px solid rgba(52,211,153,0.15)', color:'rgba(238,238,238,0.55)', fontSize:'0.81em', alignItems:'flex-start'}}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0, marginTop:'1px'}}>
                       <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>

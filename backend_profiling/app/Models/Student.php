@@ -21,6 +21,7 @@ class Student extends Model
         'Last_Name',
         'Year_Level',
         'Degree_Program',
+        'Section',
         'Email',
         'Medical_Clearance',
         'Enrollment_Status',

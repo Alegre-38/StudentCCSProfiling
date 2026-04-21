@@ -113,11 +113,21 @@ function EditStudentModal({ student, onClose, onSaved }) {
                 <option value="">Select</option>
                 <option>BS Information Technology</option>
                 <option>BS Computer Science</option>
-                <option>BS Information Systems</option>
-                <option>BS Mathematics</option>
               </select>
             </div>
-            <div><label style={lbl}>Section</label><input name="Section" value={form.Section} onChange={handleChange} placeholder="e.g. BSIT-3A" style={inp}/></div>
+            <div><label style={lbl}>Section</label>
+              <select name="Section" value={form.Section} onChange={handleChange} style={inp}>
+                <option value="">Select Section</option>
+                {['A','B','C','D','E'].map(l => {
+                  const prog = form.Degree_Program.includes('Information Technology') ? 'BSIT'
+                    : form.Degree_Program.includes('Computer Science') ? 'BSCS'
+                    : form.Degree_Program.includes('Information Systems') ? 'BSIS'
+                    : 'BS';
+                  const val = `${prog}-${form.Year_Level}${l}`;
+                  return <option key={l} value={val}>{val}</option>;
+                })}
+              </select>
+            </div>
             <div><label style={lbl}>School Year</label><input name="School_Year" value={form.School_Year} onChange={handleChange} placeholder="2024-2025" style={inp}/></div>
             <div><label style={lbl}>Enrollment Status</label>
               <select name="Enrollment_Status" value={form.Enrollment_Status} onChange={handleChange} style={inp}>

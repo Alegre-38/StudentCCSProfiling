@@ -58,6 +58,7 @@ class AuthController extends Controller
             'email'        => 'nullable|email',
             'degree_program' => 'nullable|string',
             'year_level'   => 'nullable|integer|min:1|max:5',
+            'section'      => 'nullable|string|max:20',
         ]);
 
         $userId = 'USR-' . strtoupper(substr(uniqid(), -6));
@@ -85,6 +86,7 @@ class AuthController extends Controller
                 'Last_Name'        => $request->last_name ?? '',
                 'Year_Level'       => $request->year_level ?? 1,
                 'Degree_Program'   => $request->degree_program ?? 'BS CS',
+                'Section'          => $request->section ?? null,
                 'Email'            => $request->email ?? '',
                 'Medical_Clearance'=> false,
                 'Enrollment_Status'=> 'Active',
