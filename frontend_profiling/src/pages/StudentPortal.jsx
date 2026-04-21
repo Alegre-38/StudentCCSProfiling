@@ -110,7 +110,9 @@ export default function StudentPortal() {
         </nav>
 
         <div style={{padding:'1rem 1.2rem',borderTop:'1px solid rgba(255,255,255,0.08)'}}>
-          <button onClick={logout} style={{...S.navBtn,color:'rgba(238,238,238,0.4)',width:'100%'}}>
+          <button onClick={logout} style={{display:'flex',alignItems:'center',gap:'0.65rem',width:'100%',padding:'0.75rem 1rem',borderRadius:'10px',border:'1.5px solid rgba(239,68,68,0.35)',background:'rgba(239,68,68,0.1)',color:'#f87171',fontWeight:700,fontSize:'0.88em',cursor:'pointer',transition:'all 0.2s'}}
+            onMouseEnter={e=>{e.currentTarget.style.background='rgba(239,68,68,0.2)';e.currentTarget.style.borderColor='rgba(239,68,68,0.6)';}}
+            onMouseLeave={e=>{e.currentTarget.style.background='rgba(239,68,68,0.1)';e.currentTarget.style.borderColor='rgba(239,68,68,0.35)';}}>
             <IcoLogout/> Sign out
           </button>
         </div>
@@ -706,10 +708,11 @@ function EmptyState({ icon, text, sub, positive }) {
 // ── Styles ─────────────────────────────────────────────────────────────────
 const S = {
   center:      { minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f2f5' },
-  sidebar:     { width:'220px', background:'#222831', display:'flex', flexDirection:'column', position:'fixed', top:0, left:0, bottom:0, zIndex:100, transition:'transform 0.25s ease' },  topbar:      { background:'#222831', height:'54px', display:'flex', alignItems:'center', padding:'0 1.2rem', gap:'0.75rem', boxShadow:'0 2px 12px rgba(0,0,0,0.15)', position:'sticky', top:0, zIndex:50 },
+  sidebar:     { width:'220px', background:'linear-gradient(180deg,#1a1f27 0%,#1e242d 100%)', display:'flex', flexDirection:'column', position:'fixed', top:0, left:0, bottom:0, zIndex:100, transition:'transform 0.25s ease', borderRight:'1px solid rgba(255,255,255,0.05)' },
+  topbar:      { background:'#1a1f27', height:'54px', display:'flex', alignItems:'center', padding:'0 1.2rem', gap:'0.75rem', boxShadow:'0 2px 12px rgba(0,0,0,0.2)', position:'sticky', top:0, zIndex:50 },
   menuBtn:     { background:'none', border:'none', color:'#EEEEEE', cursor:'pointer', display:'flex', alignItems:'center', padding:'0.3rem', borderRadius:'6px' },
-  navBtn:      { display:'flex', alignItems:'center', gap:'0.65rem', width:'100%', padding:'0.65rem 0.75rem', borderRadius:'10px', border:'none', background:'none', color:'rgba(238,238,238,0.55)', fontWeight:600, fontSize:'0.84em', cursor:'pointer', textAlign:'left', transition:'all 0.15s', marginBottom:'2px' },
-  navActive:   { background:'rgba(249,115,22,0.12)', color:'#F97316' },
+  navBtn:      { display:'flex', alignItems:'center', gap:'0.65rem', width:'100%', padding:'0.65rem 0.75rem', borderRadius:'10px', border:'none', background:'none', color:'rgba(238,238,238,0.45)', fontWeight:600, fontSize:'0.84em', cursor:'pointer', textAlign:'left', transition:'all 0.15s', marginBottom:'2px' },
+  navActive:   { background:'rgba(249,115,22,0.15)', color:'#F97316', boxShadow:'inset 0 0 0 1px rgba(249,115,22,0.2)' },
   avatarSm:    { width:'34px', height:'34px', borderRadius:'50%', background:'linear-gradient(135deg,#F97316,#d9620f)', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:'0.75em', flexShrink:0 },
   avatarLg:    { width:'68px', height:'68px', borderRadius:'50%', background:'linear-gradient(135deg,#F97316,#d9620f)', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:'1.5em', flexShrink:0 },
   badge:       { padding:'0.25rem 0.75rem', borderRadius:'20px', fontSize:'0.75em', fontWeight:600, background:'rgba(255,255,255,0.1)', color:'rgba(238,238,238,0.8)', border:'1px solid rgba(255,255,255,0.15)' },
