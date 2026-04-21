@@ -79,13 +79,19 @@ class AuthController extends Controller
         // If creating a Student account, auto-create a linked student record
         if ($request->role === 'Student') {
             $studentId = 'S' . strtoupper(substr(uniqid(), -5));
+            $degreeMap = [
+                'BS CS' => 'BS Computer Science',
+                'BS IT' => 'BS Information Technology',
+            ];
+            $degreeProgram = $degreeMap[$request->degree_program] ?? $request->degree_program ?? 'BS Computer Science';
+
             \App\Models\Student::create([
                 'Student_ID'       => $studentId,
                 'User_ID'          => $userId,
                 'First_Name'       => $request->first_name ?? $request->username,
                 'Last_Name'        => $request->last_name ?? '',
                 'Year_Level'       => $request->year_level ?? 1,
-                'Degree_Program'   => $request->degree_program ?? 'BS CS',
+                'Degree_Program'   => $degreeProgram,
                 'Section'          => $request->section ?? null,
                 'Email'            => $request->email ?? '',
                 'Medical_Clearance'=> false,

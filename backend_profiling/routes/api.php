@@ -62,9 +62,26 @@ Route::get('/dashboard/stats', [\App\Http\Controllers\DashboardController::class
 // Student classmates (students in same section/program/year)
 Route::get('/students/{id}/classmates', function ($id) {
     $student = \App\Models\StudentDemographic::findOrFail($id);
-    $classmates = \App\Models\StudentDemographic::where('Student_ID', '!=', $id)
-        ->when($student->Section, fn($q) => $q->where('Section', $student->Section))
-        ->select('Student_ID', 'First_Name', 'Last_Name', 'Degree_Program', 'Year_Level', 'Section', 'Enrollment_Status')
+
+    // Normalize degree program for matching (handles both short and long names)
+    $programMap = [
+        'BS IT'  => ['BS IT', 'BS Information Technology', 'BSIT'],
+        'BS CS'  => ['BS CS', 'BS Computer Science', 'BSCS'],
+        'BS Information Technology' => ['BS IT', 'BS Information Technology', 'BSIT'],
+        'BS Computer Science'       => ['BS CS', 'BS Computer Science', 'BSCS'],
+    ];
+    $matchPrograms = $programMap[$student->Degree_Program] ?? [$student->Degree_Program];
+
+    $query = \App\Models\StudentDemographic::where('Student_ID', '!=', $id)
+        ->whereIn('Degree_Program', $matchPrograms)
+        ->where('Year_Level', $student->Year_Level);
+
+    if ($student->Section) {
+        $query->where('Section', $student->Section);
+    }
+
+    $classmates = $query->select('Student_ID', 'First_Name', 'Last_Name', 'Degree_Program', 'Year_Level', 'Section', 'Enrollment_Status')
         ->get();
+
     return response()->json($classmates);
 });
