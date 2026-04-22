@@ -99,9 +99,6 @@ class FacultyCoreController extends Controller
         // Delete related roles first
         $faculty->roles()->delete();
 
-        // Delete linked user account if exists
-        \App\Models\User::where('User_ID', $faculty->User_ID)->delete();
-
         $faculty->delete();
 
         return response()->json(['message' => 'Faculty deleted successfully.']);

@@ -8,8 +8,11 @@ use App\Http\Controllers\ComprehensiveSearchController;
 use App\Http\Controllers\AuthController;
 
 // Handle CORS preflight for all routes
-Route::options('{any}', function() {
-    return response()->json([], 204);
+Route::match(['OPTIONS'], '{any}', function() {
+    return response()->json([], 204)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 })->where('any', '.*');
 
 // Auth routes (public)
