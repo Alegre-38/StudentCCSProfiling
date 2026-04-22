@@ -1,10 +1,35 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+function DeleteConfirm({ faculty, onConfirm, onCancel }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(34,40,49,0.6)', backdropFilter: 'blur(4px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+      <div style={{ background: 'white', borderRadius: '14px', padding: '2rem', maxWidth: '420px', width: '100%', boxShadow: '0 20px 60px rgba(34,40,49,0.25)' }}>
+        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+        </div>
+        <h3 style={{ margin: '0 0 0.5rem', textAlign: 'center', color: '#222831', fontSize: '1.05em', fontWeight: 800 }}>Delete Faculty?</h3>
+        <p style={{ margin: '0 0 1.5rem', textAlign: 'center', color: '#6b7280', fontSize: '0.88em', lineHeight: 1.5 }}>
+          This will permanently delete <strong style={{ color: '#222831' }}>{faculty.First_Name} {faculty.Last_Name}</strong> and all their records. This cannot be undone.
+        </p>
+        <div style={{ display: 'flex', gap: '0.8rem' }}>
+          <button onClick={onCancel} style={{ flex: 1, padding: '0.65rem', border: '1px solid #d1d5db', borderRadius: '8px', background: 'transparent', cursor: 'pointer', color: '#393E46', fontWeight: 600, fontSize: '0.93em' }}>Cancel</button>
+          <button onClick={onConfirm} style={{ flex: 1, padding: '0.65rem', border: 'none', borderRadius: '8px', background: '#ef4444', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: '0.93em' }}>Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FacultyList() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'Admin';
   const [faculties, setFaculties] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
@@ -12,13 +37,24 @@ function FacultyList() {
   const [filterType, setFilterType] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   useEffect(() => {
+    fetchFaculties();
+  }, []);
+
+  const fetchFaculties = () => {
     axios.get(`${API_URL}/faculties`)
       .then(res => { setFaculties(res.data); setFiltered(res.data); })
       .catch(err => setError(`Failed to load faculty: ${err.message}`))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  const handleDelete = () => {
+    axios.delete(`${API_URL}/faculties/${deleteTarget.Faculty_ID}`)
+      .then(() => { setDeleteTarget(null); fetchFaculties(); })
+      .catch(err => { setError(`Delete failed: ${err.message}`); setDeleteTarget(null); });
+  };
 
   useEffect(() => {
     let result = faculties;
@@ -50,6 +86,7 @@ function FacultyList() {
 
   return (
     <div className="page-container">
+      {deleteTarget && <DeleteConfirm faculty={deleteTarget} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />}
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.8rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
@@ -166,11 +203,25 @@ function FacultyList() {
                       </td>
                       <td style={{ fontSize: '0.85em', color: '#6b7280' }}>{f.Specialization || '-'}</td>
                       <td style={{ paddingRight: '1.5rem' }}>
-                        <Link to={`/faculties/${f.Faculty_ID}`}>
-                          <button className="btn-primary" style={{ padding: '0.35rem 0.9rem', fontSize: '0.83em' }}>
-                            View Profile
-                          </button>
-                        </Link>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          <Link to={`/faculties/${f.Faculty_ID}`}>
+                            <button className="btn-primary" style={{ padding: '0.35rem 0.9rem', fontSize: '0.83em' }}>
+                              View Profile
+                            </button>
+                          </Link>
+                          {isAdmin && (
+                            <button
+                              onClick={() => setDeleteTarget(f)}
+                              style={{ padding: '0.35rem 0.7rem', fontSize: '0.83em', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', background: 'rgba(239,68,68,0.06)', color: '#ef4444', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = 'white'; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; e.currentTarget.style.color = '#ef4444'; }}
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>
+                              </svg>
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );

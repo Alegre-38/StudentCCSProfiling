@@ -88,8 +88,22 @@ class FacultyCoreController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(FacultyCore $facultyCore)
+    public function destroy($id)
     {
-        //
+        $faculty = FacultyCore::find($id);
+
+        if (!$faculty) {
+            return response()->json(['message' => 'Faculty not found'], 404);
+        }
+
+        // Delete related roles first
+        $faculty->roles()->delete();
+
+        // Delete linked user account if exists
+        \App\Models\User::where('User_ID', $faculty->User_ID)->delete();
+
+        $faculty->delete();
+
+        return response()->json(['message' => 'Faculty deleted successfully.']);
     }
 }

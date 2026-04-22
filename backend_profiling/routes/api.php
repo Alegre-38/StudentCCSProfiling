@@ -51,6 +51,7 @@ Route::get('/faculties', [FacultyCoreController::class, 'index']);
 Route::post('/faculties', [FacultyCoreController::class, 'store']);
 Route::get('/faculties/{id}', [FacultyCoreController::class, 'show']);
 Route::put('/faculties/{id}', [FacultyCoreController::class, 'update']);
+Route::delete('/faculties/{id}', [FacultyCoreController::class, 'destroy']);
 Route::post('/faculties/{id}/roles', [\App\Http\Controllers\FacultyRoleController::class, 'assignRole']);
 
 // Comprehensive Search
