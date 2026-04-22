@@ -54,8 +54,8 @@ class NonAcademicHistoryController extends Controller
         $request->validate([
             'Activity_Type' => 'required|string',
             'Activity_Name' => 'required|string',
-            'Date_Logged' => 'required|date',
-            'Contribution' => 'required|string',
+            'Date_Logged'   => 'required|date',
+            'Contribution'  => 'nullable|string',
         ]);
 
         $activity = \App\Models\NonAcademicHistory::logActivity(

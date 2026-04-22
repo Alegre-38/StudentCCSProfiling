@@ -152,38 +152,62 @@ function StudentDetail() {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('academic');
-  const [showEdit, setShowEdit] = useState(false);  const [newAcademic, setNewAcademic] = useState({ Course_Code: '', Final_Grade: '', Term_Taken: '' });
+  const [showEdit, setShowEdit] = useState(false);
+  const [newAcademic, setNewAcademic] = useState({ Course_Code: '', Final_Grade: '', Term_Taken: '' });
   const [newSkill, setNewSkill] = useState({ category: '', skill: '', proficiency: '' });
   const [newActivity, setNewActivity] = useState({ type: '', name: '', date: '', contribution: '' });
   const [newDisciplinary, setNewDisciplinary] = useState({ Offense_Level: '', Date_Logged: '', Status: 'Pending' });
   const [newAffiliation, setNewAffiliation] = useState({ Org_Name: '', Role: '' });
+  // Per-section saving states — no full page reload
+  const [saving, setSaving] = useState({});
 
   useEffect(() => { fetchStudent(); }, [id]);
 
-  const fetchStudent = () => {
-    setLoading(true);
+  const fetchStudent = (silent = false) => {
+    if (!silent) setLoading(true);
     axios.get(`${API_URL}/students/${id}`)
-      .then(res => { setStudent(res.data); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(res => { setStudent(res.data); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   };
 
-  const deleteRecord = (url) => axios.delete(url).then(() => fetchStudent()).catch(console.error);
+  const deleteRecord = (url) => axios.delete(url).then(() => fetchStudent(true)).catch(console.error);
 
-  const post = (url, data, reset) =>
-    axios.post(url, data).then(() => { reset(); fetchStudent(); }).catch(console.error);
+  const post = (url, data, reset, key) => {
+    setSaving(s => ({ ...s, [key]: true }));
+    return axios.post(url, data)
+      .then(() => { reset(); fetchStudent(true); })
+      .catch(console.error)
+      .finally(() => setSaving(s => ({ ...s, [key]: false })));
+  };
 
   const handleClearanceToggle = () =>
     axios.put(`${API_URL}/students/${id}/clearance`, { Med_Clearance: !(student.Med_Clearance || student.Medical_Clearance) })
-      .then(fetchStudent).catch(console.error);
+      .then(() => fetchStudent(true)).catch(console.error);
 
-  const handleAddAcademic = e => { e.preventDefault(); post(`${API_URL}/students/${id}/academic`, newAcademic, () => setNewAcademic({ Course_Code: '', Final_Grade: '', Term_Taken: '' })); };
-  const handleAddSkill = e => { e.preventDefault(); post(`${API_URL}/students/${id}/skills`, { Skill_Category: newSkill.category, Specific_Skill: newSkill.skill, Proficiency: newSkill.proficiency }, () => setNewSkill({ category: '', skill: '', proficiency: '' })); };
-  const handleLogActivity = e => { e.preventDefault(); post(`${API_URL}/students/${id}/non-academic`, { Activity_Type: newActivity.type, Activity_Name: newActivity.name, Date_Logged: newActivity.date, Contribution: newActivity.contribution }, () => setNewActivity({ type: '', name: '', date: '', contribution: '' })); };
-  const handleAddDisciplinary = e => { e.preventDefault(); post(`${API_URL}/students/${id}/disciplinary`, newDisciplinary, () => setNewDisciplinary({ Offense_Level: '', Date_Logged: '', Status: 'Pending' })); };
-  const handleAddAffiliation = e => { e.preventDefault(); post(`${API_URL}/students/${id}/affiliations`, newAffiliation, () => setNewAffiliation({ Org_Name: '', Role: '' })); };
-  const updateDisciplinaryStatus = (recId, status) => axios.put(`${API_URL}/disciplinary/${recId}/status`, { Status: status }).then(fetchStudent).catch(console.error);
+  const handleAddAcademic    = e => { e.preventDefault(); post(`${API_URL}/students/${id}/academic`, newAcademic, () => setNewAcademic({ Course_Code: '', Final_Grade: '', Term_Taken: '' }), 'academic'); };
+  const handleAddSkill       = e => { e.preventDefault(); post(`${API_URL}/students/${id}/skills`, { Skill_Category: newSkill.category, Specific_Skill: newSkill.skill, Proficiency: newSkill.proficiency }, () => setNewSkill({ category: '', skill: '', proficiency: '' }), 'skills'); };
+  const handleLogActivity    = e => { e.preventDefault(); post(`${API_URL}/students/${id}/non-academic`, { Activity_Type: newActivity.type, Activity_Name: newActivity.name, Date_Logged: newActivity.date, Contribution: newActivity.contribution }, () => setNewActivity({ type: '', name: '', date: '', contribution: '' }), 'activities'); };
+  const handleAddDisciplinary= e => { e.preventDefault(); post(`${API_URL}/students/${id}/disciplinary`, newDisciplinary, () => setNewDisciplinary({ Offense_Level: '', Date_Logged: '', Status: 'Pending' }), 'disciplinary'); };
+  const handleAddAffiliation = e => { e.preventDefault(); post(`${API_URL}/students/${id}/affiliations`, newAffiliation, () => setNewAffiliation({ Org_Name: '', Role: '' }), 'affiliations'); };
+  const updateDisciplinaryStatus = (recId, status) => axios.put(`${API_URL}/disciplinary/${recId}/status`, { Status: status }).then(() => fetchStudent(true)).catch(console.error);
 
-  if (loading) return <div className="page-container"><p style={{ color: '#64748b', padding: '2rem' }}>Loading profile...</p></div>;
+  if (loading) return (
+    <div className="page-container" style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'60vh',flexDirection:'column',gap:'1rem'}}>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
+      <div style={{position:'relative',width:'52px',height:'52px'}}>
+        <div style={{position:'absolute',inset:0,borderRadius:'50%',border:'3px solid rgba(249,115,22,0.15)'}}/>
+        <div style={{position:'absolute',inset:0,borderRadius:'50%',border:'3px solid transparent',borderTopColor:'#F97316',animation:'spin 0.75s linear infinite'}}/>
+        <div style={{position:'absolute',inset:'10px',borderRadius:'50%',background:'rgba(249,115,22,0.1)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+      <div style={{textAlign:'center'}}>
+        <div style={{fontWeight:700,color:'#222831',fontSize:'0.95em'}}>Loading profile</div>
+        <div style={{fontSize:'0.78em',color:'#9ca3af',marginTop:'0.2rem',animation:'pulse 1.5s ease infinite'}}>Fetching student data…</div>
+      </div>
+    </div>
+  );
   if (!student) return <div className="page-container"><p style={{ color: '#ef4444', padding: '2rem' }}>Student not found.</p></div>;
 
   const cleared = student.Med_Clearance || student.Medical_Clearance;
@@ -428,7 +452,7 @@ function StudentDetail() {
           ) : <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>No activities logged yet.</p>}
           <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
             <p style={{ fontWeight: 600, color: '#374151', marginBottom: '0.8rem', fontSize: '0.88em' }}>Log Activity</p>
-            <form onSubmit={handleLogActivity} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
+            <form onSubmit={handleLogActivity} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '0.8rem', alignItems: 'end' }}>
               <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Activity Name</label><input style={inp} placeholder="e.g. Basketball Tournament" value={newActivity.name} onChange={e => setNewActivity({ ...newActivity, name: e.target.value })} required /></div>
               <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Type</label>
                 <select style={inp} value={newActivity.type} onChange={e => setNewActivity({ ...newActivity, type: e.target.value })} required>
@@ -436,6 +460,7 @@ function StudentDetail() {
                 </select>
               </div>
               <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Date</label><input style={inp} type="date" value={newActivity.date} onChange={e => setNewActivity({ ...newActivity, date: e.target.value })} required /></div>
+              <div><label style={{ display: 'block', fontSize: '0.78em', color: '#64748b', marginBottom: '0.3rem' }}>Contribution</label><input style={inp} placeholder="e.g. Gold Medal" value={newActivity.contribution} onChange={e => setNewActivity({ ...newActivity, contribution: e.target.value })} /></div>
               <button type="submit" className="btn-primary" style={{ padding: '0.55rem 1rem' }}>Log</button>
             </form>
           </div>
