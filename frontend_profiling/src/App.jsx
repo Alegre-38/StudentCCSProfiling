@@ -59,7 +59,7 @@ function ProtectedLayout() {
         <button className="sidebar-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)} aria-label="Toggle Menu">
           <IconMenu />
         </button>
-        <span className="header-title">ProfileSys</span>
+        <span className="header-title">Profiling System</span>
         <div style={{marginLeft:'auto', display:'flex', alignItems:'center', gap:'0.6rem'}}>
           <span style={{fontSize:'0.82em', color:'rgba(238,238,238,0.5)'}}>{user.username}</span>
           <button onClick={logout} title="Sign out" style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(238,238,238,0.7)',borderRadius:'8px',padding:'0.4rem 0.7rem',cursor:'pointer',display:'flex',alignItems:'center',gap:'0.4rem',fontSize:'0.82em',fontWeight:600,transition:'all 0.2s'}}>
@@ -72,7 +72,7 @@ function ProtectedLayout() {
 
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <h1>ProfileSys</h1>
+          <h1>Profiling System</h1>
           <button className="sidebar-close" onClick={() => setIsSidebarOpen(false)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -141,8 +141,8 @@ function AppRoutes() {
       <div style={{minHeight:'100vh',background:'#222831',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:'1.5rem',fontFamily:"'Inter','Segoe UI',system-ui,sans-serif"}}>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
         <div style={{animation:'fadeUp 0.5s ease',textAlign:'center'}}>
-          <div style={{fontSize:'2em',fontWeight:800,color:'#F97316',letterSpacing:'-1px',marginBottom:'0.3rem'}}>ProfileSys</div>
-          <div style={{fontSize:'0.82em',color:'rgba(238,238,238,0.3)',letterSpacing:'0.1em',textTransform:'uppercase'}}>Student Profiling System</div>
+          <div style={{fontSize:'2em',fontWeight:800,color:'#F97316',letterSpacing:'-1px',marginBottom:'0.3rem'}}>Profiling System</div>
+          <div style={{fontSize:'0.82em',color:'rgba(238,238,238,0.3)',letterSpacing:'0.1em',textTransform:'uppercase'}}>CCS Student Profiling</div>
         </div>
         <div style={{width:'36px',height:'36px',border:'3px solid rgba(249,115,22,0.2)',borderTop:'3px solid #F97316',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/>
         <div style={{fontSize:'0.78em',color:'rgba(238,238,238,0.25)',letterSpacing:'0.05em'}}>Loading your session…</div>

@@ -87,7 +87,7 @@ export default function StudentPortal() {
       {/* ── Sidebar ── */}
       <aside style={{...S.sidebar, transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)'}}>
         <div style={{padding:'1.5rem 1.2rem',borderBottom:'1px solid rgba(255,255,255,0.08)'}}>
-          <div style={{color:'#F97316',fontWeight:800,fontSize:'1.2em',letterSpacing:'-0.5px',marginBottom:'1.2rem'}}>ProfileSys</div>
+          <div style={{color:'#F97316',fontWeight:800,fontSize:'1.1em',letterSpacing:'-0.3px',marginBottom:'1.2rem'}}>Profiling System</div>
           <div style={{display:'flex',alignItems:'center',gap:'0.8rem'}}>
             <div style={S.avatarSm}>{initials}</div>
             <div style={{minWidth:0}}>
@@ -122,7 +122,7 @@ export default function StudentPortal() {
       <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0}}>
         <header style={S.topbar}>
           <button onClick={()=>setSidebarOpen(!sidebarOpen)} style={S.menuBtn}><IcoMenu/></button>
-          <span style={{color:'#F97316',fontWeight:800,fontSize:'1em',letterSpacing:'-0.3px'}}>ProfileSys</span>
+          <span style={{color:'#F97316',fontWeight:800,fontSize:'1em',letterSpacing:'-0.3px'}}>Profiling System</span>
           <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'0.75rem'}}>
             <span style={{fontSize:'0.8em',color:'rgba(238,238,238,0.5)'}}>{user.username}</span>
             <div style={S.avatarSm}>{initials}</div>

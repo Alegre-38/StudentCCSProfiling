@@ -52,7 +52,7 @@ function Login() {
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
             </div>
-            <h1 style={{margin:0, fontSize:'1.6em', fontWeight:800, color:'#EEEEEE', letterSpacing:'-0.3px'}}>ProfileSys</h1>
+            <h1 style={{margin:0, fontSize:'1.6em', fontWeight:800, color:'#EEEEEE', letterSpacing:'-0.3px'}}>Profiling System</h1>
             <p style={{margin:'0.3rem 0 0', fontSize:'0.88em', color:'rgba(238,238,238,0.45)'}}>Sign in to your account</p>
           </div>
 
