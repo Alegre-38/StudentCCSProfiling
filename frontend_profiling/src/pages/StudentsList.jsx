@@ -85,7 +85,7 @@ function StudentsList() {
       {/* Header */}
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.8rem', flexWrap:'wrap', gap:'1rem'}}>
         <div>
-          <h1 className="page-title">Students Registry</h1>
+          <h1 className="page-title">Student Information</h1>
           <p className="page-subtitle">Manage and view detailed profiles of all enrolled students.</p>
         </div>
 
