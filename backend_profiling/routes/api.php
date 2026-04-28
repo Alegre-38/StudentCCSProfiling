@@ -67,7 +67,17 @@ Route::get('/dashboard/stats', [\App\Http\Controllers\DashboardController::class
 Route::get('/students/{id}/classmates', function ($id) {
     $student = \App\Models\StudentDemographic::findOrFail($id);
 
-    // Normalize degree program for matching (handles both short and long names)
+    // Match by Section only — most reliable since section encodes program+year+letter
+    // e.g. BSCS-1B means BS Computer Science, Year 1, Section B
+    if ($student->Section) {
+        $classmates = \App\Models\StudentDemographic::where('Student_ID', '!=', $id)
+            ->where('Section', $student->Section)
+            ->select('Student_ID', 'First_Name', 'Last_Name', 'Degree_Program', 'Year_Level', 'Section', 'Enrollment_Status')
+            ->get();
+        return response()->json($classmates);
+    }
+
+    // Fallback: no section — match by program + year (normalize program names)
     $programMap = [
         'BS IT'  => ['BS IT', 'BS Information Technology', 'BSIT'],
         'BS CS'  => ['BS CS', 'BS Computer Science', 'BSCS'],
@@ -76,15 +86,10 @@ Route::get('/students/{id}/classmates', function ($id) {
     ];
     $matchPrograms = $programMap[$student->Degree_Program] ?? [$student->Degree_Program];
 
-    $query = \App\Models\StudentDemographic::where('Student_ID', '!=', $id)
+    $classmates = \App\Models\StudentDemographic::where('Student_ID', '!=', $id)
         ->whereIn('Degree_Program', $matchPrograms)
-        ->where('Year_Level', $student->Year_Level);
-
-    if ($student->Section) {
-        $query->where('Section', $student->Section);
-    }
-
-    $classmates = $query->select('Student_ID', 'First_Name', 'Last_Name', 'Degree_Program', 'Year_Level', 'Section', 'Enrollment_Status')
+        ->where('Year_Level', $student->Year_Level)
+        ->select('Student_ID', 'First_Name', 'Last_Name', 'Degree_Program', 'Year_Level', 'Section', 'Enrollment_Status')
         ->get();
 
     return response()->json($classmates);
