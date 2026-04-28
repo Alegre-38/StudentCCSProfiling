@@ -236,32 +236,26 @@ function StudentDashboard({ student }) {
             </div>
           </div>
         ) : (
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:'0.75rem'}}>
-            {classmates.map(c => {
+          <div style={{display:'flex',flexDirection:'column',gap:'0'}}>
+            {classmates.map((c, i) => {
               const ini = ((c.First_Name?.[0]||'')+(c.Last_Name?.[0]||'')).toUpperCase();
               const palette = ['#F97316','#3b82f6','#10b981','#8b5cf6','#ec4899','#f59e0b','#06b6d4','#84cc16'];
               const color = palette[(c.First_Name?.charCodeAt(0)||0) % palette.length];
               return (
                 <div key={c.Student_ID}
-                  style={{display:'flex',alignItems:'center',gap:'0.85rem',padding:'0.85rem 1rem',background:'white',borderRadius:'12px',border:'1px solid #f0f0f0',boxShadow:'0 1px 4px rgba(34,40,49,0.05)',transition:'all 0.2s'}}
-                  onMouseEnter={e=>{e.currentTarget.style.borderColor=color+'50';e.currentTarget.style.boxShadow=`0 4px 12px ${color}15`;e.currentTarget.style.transform='translateY(-1px)';}}
-                  onMouseLeave={e=>{e.currentTarget.style.borderColor='#f0f0f0';e.currentTarget.style.boxShadow='0 1px 4px rgba(34,40,49,0.05)';e.currentTarget.style.transform='translateY(0)';}}>
-                  {/* Avatar */}
-                  <div style={{width:'42px',height:'42px',borderRadius:'50%',background:`linear-gradient(135deg,${color},${color}cc)`,color:'white',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.85em',flexShrink:0,boxShadow:`0 2px 8px ${color}40`}}>
+                  style={{display:'flex',alignItems:'center',gap:'0.85rem',padding:'0.75rem 0.25rem',borderBottom: i < classmates.length-1 ? '1px solid #f0f0f0' : 'none',transition:'background 0.15s'}}
+                  onMouseEnter={e=>e.currentTarget.style.background='#fafafa'}
+                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                  <div style={{width:'36px',height:'36px',borderRadius:'50%',background:`linear-gradient(135deg,${color},${color}cc)`,color:'white',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.78em',flexShrink:0}}>
                     {ini}
                   </div>
-                  <div style={{minWidth:0,flex:1}}>
-                    <div style={{fontWeight:700,color:'#222831',fontSize:'0.88em',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
-                      {c.First_Name} {c.Last_Name}
-                    </div>
-                    <div style={{display:'flex',alignItems:'center',gap:'0.4rem',marginTop:'0.2rem',flexWrap:'wrap'}}>
-                      <span style={{fontSize:'0.7em',color:'white',background:color,borderRadius:'10px',padding:'1px 7px',fontWeight:600}}>
-                        {c.Degree_Program?.includes('Technology') ? 'BSIT' : c.Degree_Program?.includes('Science') ? 'BSCS' : c.Degree_Program}
-                      </span>
-                      <span style={{fontSize:'0.7em',color:'#9ca3af'}}>Yr {c.Year_Level}</span>
-                      {c.Section && <span style={{fontSize:'0.7em',color:'#9ca3af'}}>· {c.Section}</span>}
-                    </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontWeight:600,color:'#222831',fontSize:'0.88em'}}>{c.First_Name} {c.Last_Name}</div>
+                    <div style={{fontSize:'0.72em',color:'#9ca3af',marginTop:'1px'}}>{c.Section || `Yr ${c.Year_Level}`}</div>
                   </div>
+                  <span style={{fontSize:'0.7em',color:'white',background:color,borderRadius:'10px',padding:'2px 8px',fontWeight:600,flexShrink:0}}>
+                    {c.Degree_Program?.includes('Technology') ? 'BSIT' : 'BSCS'}
+                  </span>
                 </div>
               );
             })}
