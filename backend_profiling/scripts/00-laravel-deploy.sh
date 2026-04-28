@@ -26,3 +26,14 @@ if [ "$STUDENT_COUNT" -lt 1000 ] 2>/dev/null; then
 else
     echo "Already have $STUDENT_COUNT students, skipping seeder."
 fi
+
+echo "Seeding faculty (only if fewer than 100 exist)..."
+FACULTY_COUNT=$(php artisan tinker --no-interaction --execute="echo \App\Models\FacultyCore::count();" 2>/dev/null | tail -1 | tr -d '[:space:]')
+echo "Current faculty count: $FACULTY_COUNT"
+if [ "$FACULTY_COUNT" -lt 100 ] 2>/dev/null; then
+    echo "Running FacultySeeder..."
+    php artisan db:seed --class=FacultySeeder --force
+    echo "FacultySeeder complete."
+else
+    echo "Already have $FACULTY_COUNT faculty, skipping seeder."
+fi
