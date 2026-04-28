@@ -215,31 +215,52 @@ function StudentDashboard({ student }) {
               {student.Section ? `Section ${student.Section} · ` : ''}{student.Degree_Program} · Year {student.Year_Level}
             </div>
           </div>
-          <span style={{fontSize:'0.8em',color:'#9ca3af',fontWeight:600}}>{classmates.length} student{classmates.length!==1?'s':''}</span>
+          <span style={{background:'rgba(249,115,22,0.1)',color:'#F97316',border:'1px solid rgba(249,115,22,0.2)',borderRadius:'20px',padding:'0.2rem 0.8rem',fontSize:'0.78em',fontWeight:700}}>
+            {classmates.length} student{classmates.length!==1?'s':''}
+          </span>
         </div>
 
         {loading ? (
           <div style={{textAlign:'center',padding:'2rem',color:'#9ca3af',fontSize:'0.9em'}}>Loading classmates…</div>
         ) : classmates.length === 0 ? (
-          <div style={{textAlign:'center',padding:'2rem'}}>
-            <div style={{fontSize:'2em',marginBottom:'0.5rem'}}>👥</div>
-            <div style={{color:'#6b7280',fontWeight:600,fontSize:'0.9em'}}>No classmates found</div>
+          <div style={{textAlign:'center',padding:'2.5rem'}}>
+            <div style={{width:'56px',height:'56px',borderRadius:'50%',background:'rgba(139,92,246,0.08)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 0.8rem'}}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div style={{color:'#374151',fontWeight:700,fontSize:'0.92em'}}>No classmates found</div>
             <div style={{color:'#9ca3af',fontSize:'0.8em',marginTop:'0.3rem'}}>
               {student.Section ? 'No other students in your section yet.' : 'Ask your admin to assign you a section.'}
             </div>
           </div>
         ) : (
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:'0.75rem'}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:'0.75rem'}}>
             {classmates.map(c => {
               const ini = ((c.First_Name?.[0]||'')+(c.Last_Name?.[0]||'')).toUpperCase();
-              const colors = ['#F97316','#3b82f6','#10b981','#8b5cf6','#ec4899','#f59e0b'];
-              const color = colors[(c.First_Name?.charCodeAt(0)||0) % colors.length];
+              const palette = ['#F97316','#3b82f6','#10b981','#8b5cf6','#ec4899','#f59e0b','#06b6d4','#84cc16'];
+              const color = palette[(c.First_Name?.charCodeAt(0)||0) % palette.length];
               return (
-                <div key={c.Student_ID} style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.75rem',background:'#f9fafb',borderRadius:'10px',border:'1px solid #f0f0f0'}}>
-                  <div style={{width:'36px',height:'36px',borderRadius:'50%',background:`${color}20`,color,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.8em',flexShrink:0,border:`1px solid ${color}30`}}>{ini}</div>
-                  <div style={{minWidth:0}}>
-                    <div style={{fontWeight:600,color:'#222831',fontSize:'0.88em',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{c.First_Name} {c.Last_Name}</div>
-                    <div style={{fontSize:'0.72em',color:'#9ca3af'}}>{c.Degree_Program} · Yr {c.Year_Level}</div>
+                <div key={c.Student_ID}
+                  style={{display:'flex',alignItems:'center',gap:'0.85rem',padding:'0.85rem 1rem',background:'white',borderRadius:'12px',border:'1px solid #f0f0f0',boxShadow:'0 1px 4px rgba(34,40,49,0.05)',transition:'all 0.2s'}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=color+'50';e.currentTarget.style.boxShadow=`0 4px 12px ${color}15`;e.currentTarget.style.transform='translateY(-1px)';}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor='#f0f0f0';e.currentTarget.style.boxShadow='0 1px 4px rgba(34,40,49,0.05)';e.currentTarget.style.transform='translateY(0)';}}>
+                  {/* Avatar */}
+                  <div style={{width:'42px',height:'42px',borderRadius:'50%',background:`linear-gradient(135deg,${color},${color}cc)`,color:'white',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.85em',flexShrink:0,boxShadow:`0 2px 8px ${color}40`}}>
+                    {ini}
+                  </div>
+                  <div style={{minWidth:0,flex:1}}>
+                    <div style={{fontWeight:700,color:'#222831',fontSize:'0.88em',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                      {c.First_Name} {c.Last_Name}
+                    </div>
+                    <div style={{display:'flex',alignItems:'center',gap:'0.4rem',marginTop:'0.2rem',flexWrap:'wrap'}}>
+                      <span style={{fontSize:'0.7em',color:'white',background:color,borderRadius:'10px',padding:'1px 7px',fontWeight:600}}>
+                        {c.Degree_Program?.includes('Technology') ? 'BSIT' : c.Degree_Program?.includes('Science') ? 'BSCS' : c.Degree_Program}
+                      </span>
+                      <span style={{fontSize:'0.7em',color:'#9ca3af'}}>Yr {c.Year_Level}</span>
+                      {c.Section && <span style={{fontSize:'0.7em',color:'#9ca3af'}}>· {c.Section}</span>}
+                    </div>
                   </div>
                 </div>
               );
