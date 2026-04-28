@@ -4,8 +4,44 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 const PROGRAMS = ['BS Information Technology', 'BS Computer Science'];
+const PAGE_SIZE = 20;
 
 const COLORS = { 1: '#3b82f6', 2: '#8b5cf6', 3: '#F97316', 4: '#ef4444', 5: '#10b981', 6: '#6366f1' };
+
+function Pagination({ total, page, perPage, onChange }) {
+  const totalPages = Math.ceil(total / perPage);
+  if (totalPages <= 1) return null;
+  const pages = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= page - 2 && i <= page + 2)) pages.push(i);
+  }
+  const withEllipsis = [];
+  let prev = null;
+  for (const p of pages) {
+    if (prev && p - prev > 1) withEllipsis.push('...');
+    withEllipsis.push(p);
+    prev = p;
+  }
+  const btn = (content, active, disabled, onClick) => (
+    <button key={content} onClick={onClick} disabled={disabled}
+      style={{ minWidth: '34px', height: '34px', padding: '0 0.5rem', borderRadius: '8px', border: active ? 'none' : '1px solid #e5e7eb', background: active ? '#F97316' : disabled ? '#f9fafb' : 'white', color: active ? 'white' : disabled ? '#d1d5db' : '#393E46', fontWeight: active ? 700 : 500, fontSize: '0.85em', cursor: disabled ? 'not-allowed' : 'pointer', transition: 'all 0.15s', boxShadow: active ? '0 2px 8px rgba(249,115,22,0.3)' : 'none' }}>
+      {content}
+    </button>
+  );
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', borderTop: '1px solid #f0f0f0', flexWrap: 'wrap', gap: '0.5rem' }}>
+      <span style={{ fontSize: '0.82em', color: '#9ca3af' }}>Page {page} of {totalPages} · {total} total</span>
+      <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+        {btn('‹', false, page === 1, () => onChange(page - 1))}
+        {withEllipsis.map((p, i) =>
+          p === '...' ? <span key={`e${i}`} style={{ padding: '0 0.3rem', color: '#9ca3af', fontSize: '0.85em' }}>…</span>
+            : btn(p, p === page, false, () => onChange(p))
+        )}
+        {btn('›', false, page === totalPages, () => onChange(page + 1))}
+      </div>
+    </div>
+  );
+}
 
 const NumBadge = ({ n, color }) => (
   <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.72em', color: 'white', flexShrink: 0 }}>{n}</div>
@@ -30,6 +66,7 @@ function ComprehensiveSearch() {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
   const [resultSearch, setResultSearch] = useState('');
+  const [page, setPage] = useState(1);
 
   const handleChange = e => setFilters({ ...filters, [e.target.name]: e.target.value });
 
@@ -38,6 +75,7 @@ function ComprehensiveSearch() {
     setLoading(true);
     setError('');
     setResultSearch('');
+    setPage(1);
     const params = Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== ''));
     axios.get(`${API_URL}/search/students`, { params })
       .then(res => { setResults(res.data); setSearched(true); })
@@ -47,7 +85,7 @@ function ComprehensiveSearch() {
 
   const handleReset = () => {
     setFilters({ search: '', degree_program: '', year_level: '', enrollment_status: '', skill: '', proficiency: '', activity_type: '', violation_status: '', organization: '', clearance: '' });
-    setResults([]); setSearched(false); setResultSearch('');
+    setResults([]); setSearched(false); setResultSearch(''); setPage(1);
   };
 
   // Filter results by the inline search bar
@@ -62,6 +100,8 @@ function ComprehensiveSearch() {
       s.Degree_Program?.toLowerCase().includes(q)
     );
   }, [results, resultSearch]);
+
+  const paginated = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
 
   const inp = { padding: '0.6rem 0.9rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', outline: 'none', fontSize: '0.9em', width: '100%', color: '#222831', boxSizing: 'border-box' };
   const lbl = { display: 'block', marginBottom: '0.3rem', fontSize: '0.78em', fontWeight: 600, color: '#6b7280' };
@@ -212,6 +252,7 @@ function ComprehensiveSearch() {
               No results match your filter.
             </div>
           ) : (
+            <>
             <table>
               <thead>
                 <tr>
@@ -226,7 +267,7 @@ function ComprehensiveSearch() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((s, i) => {
+                {paginated.map((s, i) => {
                   const cleared = s.Medical_Clearance;
                   const initials = ((s.First_Name?.[0] || '') + (s.Last_Name?.[0] || '')).toUpperCase();
                   return (
@@ -287,6 +328,8 @@ function ComprehensiveSearch() {
                 })}
               </tbody>
             </table>
+            <Pagination total={filtered.length} page={page} perPage={PAGE_SIZE} onChange={p => { setPage(p); window.scrollTo(0,0); }} />
+            </>
           )}
         </div>
       )}

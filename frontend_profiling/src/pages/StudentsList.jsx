@@ -1,8 +1,54 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const PAGE_SIZE = 20;
+
+function Pagination({ total, page, perPage, onChange }) {
+  const totalPages = Math.ceil(total / perPage);
+  if (totalPages <= 1) return null;
+
+  const pages = [];
+  const delta = 2;
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= page - delta && i <= page + delta)) {
+      pages.push(i);
+    }
+  }
+  // Insert ellipsis
+  const withEllipsis = [];
+  let prev = null;
+  for (const p of pages) {
+    if (prev && p - prev > 1) withEllipsis.push('...');
+    withEllipsis.push(p);
+    prev = p;
+  }
+
+  const btn = (content, active, disabled, onClick) => (
+    <button key={content} onClick={onClick} disabled={disabled}
+      style={{ minWidth: '34px', height: '34px', padding: '0 0.5rem', borderRadius: '8px', border: active ? 'none' : '1px solid #e5e7eb', background: active ? '#F97316' : disabled ? '#f9fafb' : 'white', color: active ? 'white' : disabled ? '#d1d5db' : '#393E46', fontWeight: active ? 700 : 500, fontSize: '0.85em', cursor: disabled ? 'not-allowed' : 'pointer', transition: 'all 0.15s', boxShadow: active ? '0 2px 8px rgba(249,115,22,0.3)' : 'none' }}>
+      {content}
+    </button>
+  );
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', borderTop: '1px solid #f0f0f0', flexWrap: 'wrap', gap: '0.5rem' }}>
+      <span style={{ fontSize: '0.82em', color: '#9ca3af' }}>
+        Page {page} of {totalPages} &nbsp;·&nbsp; {total} total
+      </span>
+      <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+        {btn('‹', false, page === 1, () => onChange(page - 1))}
+        {withEllipsis.map((p, i) =>
+          p === '...'
+            ? <span key={`e${i}`} style={{ padding: '0 0.3rem', color: '#9ca3af', fontSize: '0.85em' }}>…</span>
+            : btn(p, p === page, false, () => onChange(p))
+        )}
+        {btn('›', false, page === totalPages, () => onChange(page + 1))}
+      </div>
+    </div>
+  );
+}
 
 function DeleteConfirm({ student, onConfirm, onCancel }) {
   return (
@@ -36,6 +82,7 @@ function StudentsList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [page, setPage] = useState(1);
 
   const fetchStudents = () => {
     axios.get(`${API_URL}/students`)
@@ -62,6 +109,7 @@ function StudentsList() {
     if (filterClearance === 'cleared')  result = result.filter(s => s.Med_Clearance || s.Medical_Clearance);
     if (filterClearance === 'pending')  result = result.filter(s => !s.Med_Clearance && !s.Medical_Clearance);
     setFiltered(result);
+    setPage(1);
   }, [search, filterProgram, filterYear, filterClearance, students]);
 
   const handleDelete = () => {
@@ -71,6 +119,7 @@ function StudentsList() {
   };
 
   const programs = [...new Set(students.map(s => s.Degree_Program).filter(Boolean))];
+  const paginated = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
 
   const inputBase = {
     padding:'0.55rem 0.9rem', borderRadius:'8px', border:'1px solid #e5e7eb',
@@ -129,7 +178,7 @@ function StudentsList() {
         {/* Stats row */}
         <div style={{display:'flex', gap:'1.5rem', marginTop:'1rem', paddingTop:'1rem', borderTop:'1px solid #f0f0f0', flexWrap:'wrap'}}>
           <span style={{fontSize:'0.82em', color:'#6b7280'}}>
-            Showing <strong style={{color:'#222831'}}>{filtered.length}</strong> of <strong style={{color:'#222831'}}>{students.length}</strong> students
+            Showing <strong style={{color:'#222831'}}>{Math.min((page-1)*PAGE_SIZE+1, filtered.length)}–{Math.min(page*PAGE_SIZE, filtered.length)}</strong> of <strong style={{color:'#222831'}}>{filtered.length}</strong> students
           </span>
           {(search || filterProgram || filterYear || filterClearance) && (
             <button onClick={() => { setSearch(''); setFilterProgram(''); setFilterYear(''); setFilterClearance(''); }}
@@ -169,7 +218,7 @@ function StudentsList() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((student, i) => {
+                paginated.map((student, i) => {
                   const cleared = student.Med_Clearance || student.Medical_Clearance;
                   return (
                     <tr key={student.Student_ID} style={{animationDelay:`${i*0.03}s`}}>
@@ -225,6 +274,9 @@ function StudentsList() {
               )}
             </tbody>
           </table>
+        )}
+        {!loading && filtered.length > 0 && (
+          <Pagination total={filtered.length} page={page} perPage={PAGE_SIZE} onChange={setPage} />
         )}
       </div>
     </div>
