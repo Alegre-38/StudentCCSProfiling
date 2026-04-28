@@ -15,3 +15,14 @@ php artisan migrate --force
 
 echo "Seeding admin..."
 php artisan db:seed --class=AdminSeeder --force
+
+echo "Seeding students (only if fewer than 1000 exist)..."
+STUDENT_COUNT=$(php artisan tinker --no-interaction --execute="echo \App\Models\StudentDemographic::count();" 2>/dev/null | tail -1 | tr -d '[:space:]')
+echo "Current student count: $STUDENT_COUNT"
+if [ "$STUDENT_COUNT" -lt 1000 ] 2>/dev/null; then
+    echo "Running StudentSeeder..."
+    php artisan db:seed --class=StudentSeeder --force
+    echo "StudentSeeder complete."
+else
+    echo "Already have $STUDENT_COUNT students, skipping seeder."
+fi
