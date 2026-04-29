@@ -177,7 +177,9 @@ export default function StudentPortal() {
 // ── Student Dashboard ──────────────────────────────────────────────────────
 function StudentDashboard({ student }) {
   const [classmates, setClassmates] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]       = useState(true);
+  const [cmPage, setCmPage]         = useState(1);
+  const CM_PER_PAGE = 10;
 
   useEffect(() => {
     axios.get(`${API}/students/${student.Student_ID}/classmates`)
@@ -186,7 +188,8 @@ function StudentDashboard({ student }) {
       .finally(() => setLoading(false));
   }, [student.Student_ID]);
 
-  const cleared = student.Med_Clearance || student.Medical_Clearance;
+  const totalPages  = Math.ceil(classmates.length / CM_PER_PAGE);
+  const paginated   = classmates.slice((cmPage - 1) * CM_PER_PAGE, cmPage * CM_PER_PAGE);
 
   return (
     <div style={{animation:'fadeIn 0.3s ease'}}>
@@ -236,30 +239,66 @@ function StudentDashboard({ student }) {
             </div>
           </div>
         ) : (
-          <div style={{display:'flex',flexDirection:'column',gap:'0'}}>
-            {classmates.map((c, i) => {
-              const ini = ((c.First_Name?.[0]||'')+(c.Last_Name?.[0]||'')).toUpperCase();
-              const palette = ['#F97316','#3b82f6','#10b981','#8b5cf6','#ec4899','#f59e0b','#06b6d4','#84cc16'];
-              const color = palette[(c.First_Name?.charCodeAt(0)||0) % palette.length];
-              return (
-                <div key={c.Student_ID}
-                  style={{display:'flex',alignItems:'center',gap:'0.85rem',padding:'0.75rem 0.25rem',borderBottom: i < classmates.length-1 ? '1px solid #f0f0f0' : 'none',transition:'background 0.15s'}}
-                  onMouseEnter={e=>e.currentTarget.style.background='#fafafa'}
-                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                  <div style={{width:'36px',height:'36px',borderRadius:'50%',background:`linear-gradient(135deg,${color},${color}cc)`,color:'white',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.78em',flexShrink:0}}>
-                    {ini}
+          <>
+            <div style={{display:'flex',flexDirection:'column',gap:'0'}}>
+              {paginated.map((c, i) => {
+                const ini = ((c.First_Name?.[0]||'')+(c.Last_Name?.[0]||'')).toUpperCase();
+                const palette = ['#F97316','#3b82f6','#10b981','#8b5cf6','#ec4899','#f59e0b','#06b6d4','#84cc16'];
+                const color = palette[(c.First_Name?.charCodeAt(0)||0) % palette.length];
+                return (
+                  <div key={c.Student_ID}
+                    style={{display:'flex',alignItems:'center',gap:'0.85rem',padding:'0.75rem 0.25rem',borderBottom: i < paginated.length-1 ? '1px solid #f0f0f0' : 'none',transition:'background 0.15s'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='#fafafa'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    <div style={{width:'36px',height:'36px',borderRadius:'50%',background:`linear-gradient(135deg,${color},${color}cc)`,color:'white',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.78em',flexShrink:0}}>
+                      {ini}
+                    </div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontWeight:600,color:'#222831',fontSize:'0.88em'}}>{c.First_Name} {c.Last_Name}</div>
+                      <div style={{fontSize:'0.72em',color:'#9ca3af',marginTop:'1px'}}>{c.Section || `Yr ${c.Year_Level}`}</div>
+                    </div>
+                    <span style={{fontSize:'0.7em',color:'white',background:color,borderRadius:'10px',padding:'2px 8px',fontWeight:600,flexShrink:0}}>
+                      {c.Degree_Program?.includes('Technology') ? 'BSIT' : 'BSCS'}
+                    </span>
                   </div>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontWeight:600,color:'#222831',fontSize:'0.88em'}}>{c.First_Name} {c.Last_Name}</div>
-                    <div style={{fontSize:'0.72em',color:'#9ca3af',marginTop:'1px'}}>{c.Section || `Yr ${c.Year_Level}`}</div>
-                  </div>
-                  <span style={{fontSize:'0.7em',color:'white',background:color,borderRadius:'10px',padding:'2px 8px',fontWeight:600,flexShrink:0}}>
-                    {c.Degree_Program?.includes('Technology') ? 'BSIT' : 'BSCS'}
-                  </span>
+                );
+              })}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:'0.9rem',marginTop:'0.5rem',borderTop:'1px solid #f0f0f0'}}>
+                <span style={{fontSize:'0.75em',color:'#9ca3af'}}>
+                  {(cmPage-1)*CM_PER_PAGE+1}–{Math.min(cmPage*CM_PER_PAGE, classmates.length)} of {classmates.length}
+                </span>
+                <div style={{display:'flex',gap:'0.3rem',alignItems:'center'}}>
+                  <button onClick={()=>setCmPage(p=>Math.max(1,p-1))} disabled={cmPage===1}
+                    style={{width:'30px',height:'30px',borderRadius:'8px',border:'1px solid #e5e7eb',background:cmPage===1?'#f9fafb':'white',color:cmPage===1?'#d1d5db':'#393E46',cursor:cmPage===1?'not-allowed':'pointer',fontWeight:600,fontSize:'0.9em',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    ‹
+                  </button>
+                  {Array.from({length:totalPages},(_,i)=>i+1)
+                    .filter(p => p===1 || p===totalPages || Math.abs(p-cmPage)<=1)
+                    .reduce((acc,p,i,arr)=>{
+                      if(i>0 && p-arr[i-1]>1) acc.push('...');
+                      acc.push(p);
+                      return acc;
+                    },[])
+                    .map((p,i)=> p==='...'
+                      ? <span key={`e${i}`} style={{padding:'0 0.2rem',color:'#9ca3af',fontSize:'0.8em'}}>…</span>
+                      : <button key={p} onClick={()=>setCmPage(p)}
+                          style={{width:'30px',height:'30px',borderRadius:'8px',border:'none',background:p===cmPage?'#F97316':'white',color:p===cmPage?'white':'#393E46',cursor:'pointer',fontWeight:p===cmPage?700:500,fontSize:'0.82em',boxShadow:p===cmPage?'0 2px 6px rgba(249,115,22,0.3)':'none'}}>
+                          {p}
+                        </button>
+                    )
+                  }
+                  <button onClick={()=>setCmPage(p=>Math.min(totalPages,p+1))} disabled={cmPage===totalPages}
+                    style={{width:'30px',height:'30px',borderRadius:'8px',border:'1px solid #e5e7eb',background:cmPage===totalPages?'#f9fafb':'white',color:cmPage===totalPages?'#d1d5db':'#393E46',cursor:cmPage===totalPages?'not-allowed':'pointer',fontWeight:600,fontSize:'0.9em',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    ›
+                  </button>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
