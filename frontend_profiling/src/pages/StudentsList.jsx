@@ -118,7 +118,8 @@ function StudentsList() {
       .catch(err => { setError(`Delete failed: ${err.message}`); setDeleteTarget(null); });
   };
 
-  const programs = [...new Set(students.map(s => s.Degree_Program).filter(Boolean))];
+  const VALID_PROGRAMS = ['BS Computer Science', 'BS Information Technology'];
+  const programs = [...new Set(students.map(s => s.Degree_Program).filter(p => VALID_PROGRAMS.includes(p)))];
   const paginated = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
 
   const inputBase = {

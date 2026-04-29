@@ -17,6 +17,9 @@ class DashboardController extends Controller
 {
     public function stats()
     {
+        // Clear cache so changes take effect immediately
+        Cache::forget('dashboard_stats');
+
         // Cache for 2 minutes to avoid hammering the DB on every page visit
         return Cache::remember('dashboard_stats', 120, function () {
 
@@ -34,13 +37,31 @@ class DashboardController extends Controller
             $cleared = (int) $studentStats->cleared;
 
             // Breakdowns via GROUP BY — no full table loads
-            $programBreakdown = DB::table('students')
+            // Normalize and group only the two valid programs
+            $validPrograms = ['BS Computer Science', 'BS Information Technology'];
+            $programMap = [
+                'BS CS' => 'BS Computer Science',
+                'BSCS'  => 'BS Computer Science',
+                'BS IT' => 'BS Information Technology',
+                'BSIT'  => 'BS Information Technology',
+                'BS Information Technology' => 'BS Information Technology',
+                'BS Computer Science'       => 'BS Computer Science',
+            ];
+
+            $rawPrograms = DB::table('students')
                 ->select('Degree_Program', DB::raw('COUNT(*) as count'))
                 ->whereNotNull('Degree_Program')
                 ->groupBy('Degree_Program')
-                ->orderByDesc('count')
-                ->limit(5)
                 ->pluck('count', 'Degree_Program');
+
+            $programBreakdown = collect($validPrograms)->mapWithKeys(fn($p) => [$p => 0]);
+            foreach ($rawPrograms as $prog => $count) {
+                $normalized = $programMap[$prog] ?? null;
+                if ($normalized) {
+                    $programBreakdown[$normalized] = ($programBreakdown[$normalized] ?? 0) + $count;
+                }
+            }
+            $programBreakdown = $programBreakdown->filter(fn($v) => $v > 0)->sortByDesc(fn($v) => $v);
 
             $yearBreakdown = DB::table('students')
                 ->select('Year_Level', DB::raw('COUNT(*) as count'))
