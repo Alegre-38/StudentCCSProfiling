@@ -21,7 +21,7 @@ class StudentAccountCreated extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Your ProfileSys Account Has Been Created');
+        return new Envelope(subject: 'Your Profiling System Account Has Been Created');
     }
 
     public function content(): Content

@@ -43,16 +43,16 @@ services:
       - key: MAIL_MAILER
         value: smtp
       - key: MAIL_HOST
-        value: smtp.gmail.com
+        value: smtp-relay.brevo.com
       - key: MAIL_PORT
         value: 587
       - key: MAIL_ENCRYPTION
         value: tls
       - key: MAIL_USERNAME
-        sync: false   # your Gmail address
+        sync: false   # your Brevo login email
       - key: MAIL_PASSWORD
-        sync: false   # your Gmail App Password (16 chars)
+        sync: false   # your Brevo SMTP key (not login password)
       - key: MAIL_FROM_ADDRESS
-        sync: false   # same Gmail address
+        sync: false   # your verified sender email in Brevo
       - key: MAIL_FROM_NAME
-        value: ProfileSys
+        value: Profiling System
