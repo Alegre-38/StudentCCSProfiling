@@ -5,6 +5,219 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 const PAGE_SIZE = 20;
 
+const SPORT_OPTIONS = ['Basketball','Volleyball','Swimming','Badminton','Football','Table Tennis','All Sports'];
+const ACTIVITY_OPTIONS = ['Sports','Cultural','Community Service','Leadership','Academic Competition'];
+const SKILL_OPTIONS = ['Python','Java','Web Development','Database Management','Networking','Cybersecurity','Mobile Development','UI/UX Design'];
+
+function ExportModal({ students, onClose }) {
+  const [exportType, setExportType] = useState('all'); // all | sport | activity | skill | clearance
+  const [sportFilter, setSportFilter] = useState('Basketball');
+  const [activityFilter, setActivityFilter] = useState('Sports');
+  const [skillFilter, setSkillFilter] = useState('');
+  const [clearanceFilter, setClearanceFilter] = useState('cleared');
+  const [loading, setLoading] = useState(false);
+
+  const inp = { width:'100%', padding:'0.6rem 0.9rem', borderRadius:'8px', border:'1px solid #e5e7eb', fontSize:'0.88em', color:'#222831', outline:'none', background:'white', boxSizing:'border-box' };
+  const lbl = { display:'block', marginBottom:'0.3rem', fontSize:'0.75em', fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'0.06em' };
+
+  const handleExport = async () => {
+    setLoading(true);
+    try {
+      let exportStudents = [...students];
+      let filterLabel = 'All Students';
+
+      if (exportType === 'clearance') {
+        const cleared = clearanceFilter === 'cleared';
+        exportStudents = students.filter(s => cleared ? (s.Med_Clearance || s.Medical_Clearance) : (!s.Med_Clearance && !s.Medical_Clearance));
+        filterLabel = cleared ? 'Cleared Students' : 'Pending Clearance Students';
+      } else if (exportType === 'sport' || exportType === 'activity' || exportType === 'skill') {
+        // Fetch full student details with related records
+        setLoading(true);
+        const ids = students.map(s => s.Student_ID);
+        // Use comprehensive search endpoint
+        let params = {};
+        if (exportType === 'sport') {
+          params.skill = sportFilter === 'All Sports' ? '' : sportFilter;
+          params.activity_type = 'Sports';
+          filterLabel = sportFilter === 'All Sports' ? 'All Sports Players' : `${sportFilter} Players`;
+        } else if (exportType === 'activity') {
+          params.activity_type = activityFilter;
+          filterLabel = `${activityFilter} Activities`;
+        } else if (exportType === 'skill') {
+          params.skill = skillFilter;
+          filterLabel = `Skill: ${skillFilter}`;
+        }
+        const res = await axios.get(`${API_URL}/search/students`, { params });
+        exportStudents = res.data;
+      }
+
+      generatePDF(exportStudents, filterLabel);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+      onClose();
+    }
+  };
+
+  const generatePDF = (data, filterLabel) => {
+    const now = new Date().toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
+    const cleared = data.filter(s => s.Med_Clearance || s.Medical_Clearance).length;
+
+    const rows = data.map((s, i) => `
+      <tr style="background:${i%2===0?'#fff':'#f9fafb'}">
+        <td>${i+1}</td>
+        <td style="font-family:monospace;font-size:11px;color:#6b7280">${s.Student_ID}</td>
+        <td><strong>${s.Last_Name}, ${s.First_Name}</strong></td>
+        <td>${s.Degree_Program || '—'}</td>
+        <td>Year ${s.Year_Level}</td>
+        <td>${s.Section || '—'}</td>
+        <td>${s.Email || s.Email_Address || '—'}</td>
+        <td>${s.Enrollment_Status || '—'}</td>
+        <td style="color:${(s.Med_Clearance||s.Medical_Clearance)?'#16a34a':'#d97706'};font-weight:700">
+          ${(s.Med_Clearance||s.Medical_Clearance)?'Cleared':'Pending'}
+        </td>
+      </tr>`).join('');
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>${filterLabel} — Student Report</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#222831;padding:32px}
+      .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #F97316}
+      .logo-area{display:flex;align-items:center;gap:12px}
+      .school{font-size:13px;font-weight:800;color:#222831}
+      .dept{font-size:11px;color:#6b7280}
+      .report-title{font-size:18px;font-weight:800;color:#F97316;margin-top:4px}
+      .meta{text-align:right;font-size:11px;color:#9ca3af}
+      .stats{display:flex;gap:12px;margin-bottom:16px}
+      .stat{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px}
+      .stat-val{font-size:18px;font-weight:800}
+      .filter-tag{display:inline-block;background:#fff8f0;border:1px solid #fed7aa;border-radius:6px;padding:5px 12px;margin-bottom:14px;font-size:11px;color:#92400e;font-weight:600}
+      table{width:100%;border-collapse:collapse;font-size:11px}
+      thead tr{background:#222831;color:white}
+      th{padding:8px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+      td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+      .footer{margin-top:20px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;text-align:center}
+      @media print{body{padding:16px}}
+    </style></head><body>
+    <div class="header">
+      <div class="logo-area">
+        <div>
+          <div class="school">Pamantasan ng Cabuyao</div>
+          <div class="dept">College of Computer Studies</div>
+          <div class="report-title">${filterLabel}</div>
+        </div>
+      </div>
+      <div class="meta"><div>Generated: ${now}</div><div>Total: ${data.length} students</div></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-val" style="color:#F97316">${data.length}</div><div style="font-size:10px;color:#9ca3af;text-transform:uppercase">Total</div></div>
+      <div class="stat"><div class="stat-val" style="color:#16a34a">${cleared}</div><div style="font-size:10px;color:#9ca3af;text-transform:uppercase">Cleared</div></div>
+      <div class="stat"><div class="stat-val" style="color:#d97706">${data.length-cleared}</div><div style="font-size:10px;color:#9ca3af;text-transform:uppercase">Pending</div></div>
+    </div>
+    <div class="filter-tag">📋 Export Filter: ${filterLabel}</div>
+    <table>
+      <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Program</th><th>Year</th><th>Section</th><th>Email</th><th>Status</th><th>Clearance</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="footer">CCS Student Profiling System · Pamantasan ng Cabuyao · Confidential · ${now}</div>
+    </body></html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    win.onload = () => win.print();
+  };
+
+  return (
+    <div style={{position:'fixed',inset:0,background:'rgba(34,40,49,0.6)',backdropFilter:'blur(4px)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
+      <div style={{background:'white',borderRadius:'16px',width:'100%',maxWidth:'480px',boxShadow:'0 24px 60px rgba(34,40,49,0.25)',overflow:'hidden'}}>
+        <div style={{height:'3px',background:'linear-gradient(90deg,#F97316,#d9620f)'}}/>
+        <div style={{padding:'1.5rem'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.3rem'}}>
+            <div>
+              <div style={{fontWeight:800,fontSize:'1em',color:'#222831'}}>Export Students to PDF</div>
+              <div style={{fontSize:'0.78em',color:'#9ca3af',marginTop:'2px'}}>Choose what to include in the report</div>
+            </div>
+            <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',color:'#9ca3af',padding:'0.2rem',boxShadow:'none'}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+
+          {/* Export type selector */}
+          <div style={{marginBottom:'1.2rem'}}>
+            <label style={lbl}>Export Type</label>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem'}}>
+              {[
+                {val:'all',      label:'All Students',    icon:'👥'},
+                {val:'sport',    label:'By Sport',        icon:'🏀'},
+                {val:'activity', label:'By Activity',     icon:'🎭'},
+                {val:'skill',    label:'By Skill',        icon:'💡'},
+                {val:'clearance',label:'By Clearance',    icon:'✅'},
+              ].map(({val,label,icon}) => (
+                <button key={val} type="button" onClick={() => setExportType(val)}
+                  style={{padding:'0.6rem 0.8rem',borderRadius:'9px',border:`1.5px solid ${exportType===val?'#F97316':'#e5e7eb'}`,background:exportType===val?'rgba(249,115,22,0.06)':'white',color:exportType===val?'#F97316':'#6b7280',fontWeight:exportType===val?700:500,fontSize:'0.83em',cursor:'pointer',transition:'all 0.15s',textAlign:'left',display:'flex',alignItems:'center',gap:'0.4rem'}}>
+                  <span>{icon}</span>{label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Conditional filters */}
+          {exportType === 'sport' && (
+            <div style={{marginBottom:'1.2rem'}}>
+              <label style={lbl}>Select Sport</label>
+              <select value={sportFilter} onChange={e => setSportFilter(e.target.value)} style={inp}>
+                {SPORT_OPTIONS.map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
+          )}
+          {exportType === 'activity' && (
+            <div style={{marginBottom:'1.2rem'}}>
+              <label style={lbl}>Activity Type</label>
+              <select value={activityFilter} onChange={e => setActivityFilter(e.target.value)} style={inp}>
+                {ACTIVITY_OPTIONS.map(a => <option key={a}>{a}</option>)}
+              </select>
+            </div>
+          )}
+          {exportType === 'skill' && (
+            <div style={{marginBottom:'1.2rem'}}>
+              <label style={lbl}>Skill</label>
+              <select value={skillFilter} onChange={e => setSkillFilter(e.target.value)} style={inp}>
+                <option value="">Select a skill</option>
+                {SKILL_OPTIONS.map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
+          )}
+          {exportType === 'clearance' && (
+            <div style={{marginBottom:'1.2rem'}}>
+              <label style={lbl}>Clearance Status</label>
+              <select value={clearanceFilter} onChange={e => setClearanceFilter(e.target.value)} style={inp}>
+                <option value="cleared">Cleared Students</option>
+                <option value="pending">Pending Clearance</option>
+              </select>
+            </div>
+          )}
+
+          <div style={{display:'flex',gap:'0.8rem',marginTop:'0.5rem'}}>
+            <button onClick={onClose} style={{flex:1,padding:'0.7rem',border:'1px solid #e5e7eb',borderRadius:'9px',background:'white',color:'#393E46',fontWeight:600,fontSize:'0.88em',cursor:'pointer'}}>
+              Cancel
+            </button>
+            <button onClick={handleExport} disabled={loading || (exportType==='skill' && !skillFilter)}
+              style={{flex:2,padding:'0.7rem',borderRadius:'9px',background:loading?'rgba(249,115,22,0.5)':'linear-gradient(135deg,#F97316,#d9620f)',color:'white',border:'none',fontWeight:700,fontSize:'0.88em',cursor:loading?'not-allowed':'pointer',boxShadow:'0 3px 12px rgba(249,115,22,0.3)',display:'flex',alignItems:'center',justifyContent:'center',gap:'0.5rem'}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              </svg>
+              {loading ? 'Preparing...' : 'Generate PDF'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Pagination({ total, page, perPage, onChange }) {
   const totalPages = Math.ceil(total / perPage);
   if (totalPages <= 1) return null;
@@ -83,6 +296,7 @@ function StudentsList() {
   const [error, setError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [page, setPage] = useState(1);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const fetchStudents = () => {
     axios.get(`${API_URL}/students`)
@@ -212,13 +426,14 @@ function StudentsList() {
     <div className="page-container">
       {deleteTarget && <DeleteConfirm student={deleteTarget} 
       onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />}
+      {showExportModal && <ExportModal students={filtered} onClose={() => setShowExportModal(false)} />}
       {/* Header */}
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'1.8rem', flexWrap:'wrap', gap:'1rem'}}>
         <div>
           <h1 className="page-title">Student Information</h1>
           <p className="page-subtitle">Manage and view detailed profiles of all enrolled students.</p>
         </div>
-        <button onClick={exportPDF} disabled={filtered.length === 0}
+        <button onClick={() => setShowExportModal(true)} disabled={filtered.length === 0}
           style={{display:'flex',alignItems:'center',gap:'0.5rem',padding:'0.65rem 1.3rem',borderRadius:'9px',border:'1px solid rgba(249,115,22,0.3)',background:'rgba(249,115,22,0.06)',color:'#F97316',fontWeight:700,fontSize:'0.85em',cursor:filtered.length===0?'not-allowed':'pointer',transition:'all 0.2s',opacity:filtered.length===0?0.5:1}}
           onMouseEnter={e=>{if(filtered.length>0){e.currentTarget.style.background='#F97316';e.currentTarget.style.color='white';}}}
           onMouseLeave={e=>{e.currentTarget.style.background='rgba(249,115,22,0.06)';e.currentTarget.style.color='#F97316';}}>
