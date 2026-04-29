@@ -12,13 +12,20 @@ const Bar = ({ value, color }) => (
 );
 
 export default function Dashboard() {
-  const [s, setS]         = useState(null);
+  const [s, setS]             = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(null);
+
+  const fetchStats = () => {
+    axios.get(`${API_URL}/dashboard/stats`)
+      .then(res => { setS(res.data); setLastUpdated(new Date()); setLoading(false); })
+      .catch(() => setLoading(false));
+  };
 
   useEffect(() => {
-    axios.get(`${API_URL}/dashboard/stats`)
-      .then(res => { setS(res.data); setLoading(false); })
-      .catch(() => setLoading(false));
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000); // refresh every 30s
+    return () => clearInterval(interval);
   }, []);
 
   if (loading || !s) return (
@@ -65,10 +72,19 @@ export default function Dashboard() {
   return (
     <div className="page-container">
       {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 className="page-title">Dashboard Overview</h1>
-        <p className="page-subtitle">Live summary of the Student Profiling System.</p>
+      <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div>
+          <h1 className="page-title">Dashboard Overview</h1>
+          <p className="page-subtitle">Live summary of the Student Profiling System.</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.9rem', borderRadius: '20px', background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.2)' }}>
+          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#16a34a', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+          <span style={{ fontSize: '0.75em', fontWeight: 600, color: '#16a34a' }}>
+            Live · {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}` : 'Loading...'}
+          </span>
+        </div>
       </div>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
 
       {/* Top stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '1rem', marginBottom: '1.5rem' }}>

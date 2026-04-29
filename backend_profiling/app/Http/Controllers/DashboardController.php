@@ -17,11 +17,10 @@ class DashboardController extends Controller
 {
     public function stats()
     {
-        // Clear cache so changes take effect immediately
+        // Always clear cache so dashboard reflects latest data
         Cache::forget('dashboard_stats');
 
-        // Cache for 2 minutes to avoid hammering the DB on every page visit
-        return Cache::remember('dashboard_stats', 600, function () {
+        return Cache::remember('dashboard_stats', 30, function () {
 
             // Single query for all student aggregates
             $studentStats = DB::table('students')->selectRaw("
