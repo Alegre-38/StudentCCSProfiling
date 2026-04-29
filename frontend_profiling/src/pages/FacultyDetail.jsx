@@ -30,7 +30,7 @@ const IconEdit = () => (
 const InfoRow = ({ label, value }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
     <span style={{ fontSize: '0.72em', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
-    <span style={{ fontSize: '0.93em', color: '#222831', fontWeight: 500 }}>{value || <span style={{ color: '#d1d5db' }}>—</span>}</span>
+    <span style={{ fontSize: '0.93em', color: '#222831', fontWeight: 500 }}>{value || <span style={{ color: '#d1d5db' }}>ï¿½</span>}</span>
   </div>
 );
 
@@ -105,9 +105,6 @@ function EditModal({ faculty, onClose, onSaved }) {
                 <option value="">Select</option>
                 <option>Computer Science</option>
                 <option>Information Technology</option>
-                <option>Information Systems</option>
-                <option>Mathematics</option>
-                <option>Engineering</option>
               </select>
             </div>
             <div>

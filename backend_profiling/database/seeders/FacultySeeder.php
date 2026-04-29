@@ -23,8 +23,7 @@ class FacultySeeder extends Seeder
                        'Pascual','Navarro','Soriano','Aguilar','Diaz','Fernandez','Hernandez','Perez',
                        'Rivera','Ramirez','Jimenez','Alvarez','Romero','Serrano','Lim','Tan','Ong'];
 
-        $departments    = ['Computer Science', 'Information Technology', 'Information Systems',
-                           'Mathematics', 'Engineering', 'Natural Sciences', 'Social Sciences'];
+        $departments    = ['Computer Science', 'Information Technology'];
         $positions      = ['Professor', 'Associate Professor', 'Assistant Professor', 'Instructor',
                            'Lecturer', 'Department Head', 'Dean'];
         $employmentTypes= ['Full-Time', 'Part-Time', 'Contractual'];
