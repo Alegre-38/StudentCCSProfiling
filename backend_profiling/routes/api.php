@@ -57,6 +57,9 @@ Route::put('/faculties/{id}', [FacultyCoreController::class, 'update']);
 Route::delete('/faculties/{id}', [FacultyCoreController::class, 'destroy']);
 Route::post('/faculties/{id}/roles', [\App\Http\Controllers\FacultyRoleController::class, 'assignRole']);
 
+// Health ping — keeps the server awake
+Route::get('/ping', fn() => response()->json(['status' => 'ok', 'time' => now()->toISOString()]));
+
 // Comprehensive Search
 Route::get('/search/students', [ComprehensiveSearchController::class, 'search']);
 

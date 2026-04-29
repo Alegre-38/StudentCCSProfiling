@@ -12,7 +12,27 @@ class StudentDemographicController extends Controller
      */
     public function index()
     {
-        return response()->json(StudentDemographic::all());
+        // Return paginated results to avoid loading all students at once
+        $perPage = request('per_page', 100);
+        $page    = request('page', 1);
+
+        $query = \App\Models\StudentDemographic::query();
+
+        // Support search filter from frontend
+        if (request('search')) {
+            $q = request('search');
+            $query->where(function($q2) use ($q) {
+                $q2->where('First_Name', 'like', "%{$q}%")
+                   ->orWhere('Last_Name',  'like', "%{$q}%")
+                   ->orWhere('Student_ID', 'like', "%{$q}%")
+                   ->orWhere('Email',      'like', "%{$q}%");
+            });
+        }
+
+        return response()->json($query->orderBy('Last_Name')
+            ->select('Student_ID','First_Name','Last_Name','Degree_Program','Year_Level',
+                     'Email','Medical_Clearance','Enrollment_Status','Section')
+            ->get());
     }
 
     /**

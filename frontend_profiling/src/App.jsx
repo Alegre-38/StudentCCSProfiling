@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { useKeepAlive } from './hooks/useKeepAlive';
 import './App.css';
 
 // Lazy-loaded pages
@@ -176,6 +177,7 @@ function StudentLayout() {
 }
 
 function App() {
+  useKeepAlive();
   return (
     <AuthProvider>
       <AppRoutes />

@@ -21,7 +21,7 @@ class DashboardController extends Controller
         Cache::forget('dashboard_stats');
 
         // Cache for 2 minutes to avoid hammering the DB on every page visit
-        return Cache::remember('dashboard_stats', 120, function () {
+        return Cache::remember('dashboard_stats', 600, function () {
 
             // Single query for all student aggregates
             $studentStats = DB::table('students')->selectRaw("
