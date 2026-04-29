@@ -37,15 +37,14 @@ class DashboardController extends Controller
             $cleared = (int) $studentStats->cleared;
 
             // Breakdowns via GROUP BY — no full table loads
-            // Normalize and group only the two valid programs
-            $validPrograms = ['BS Computer Science', 'BS Information Technology'];
+            // Normalize ALL program variants to only the two valid programs
             $programMap = [
-                'BS CS' => 'BS Computer Science',
-                'BSCS'  => 'BS Computer Science',
-                'BS IT' => 'BS Information Technology',
-                'BSIT'  => 'BS Information Technology',
-                'BS Information Technology' => 'BS Information Technology',
                 'BS Computer Science'       => 'BS Computer Science',
+                'BS CS'                     => 'BS Computer Science',
+                'BSCS'                      => 'BS Computer Science',
+                'BS Information Technology' => 'BS Information Technology',
+                'BS IT'                     => 'BS Information Technology',
+                'BSIT'                      => 'BS Information Technology',
             ];
 
             $rawPrograms = DB::table('students')
@@ -54,14 +53,18 @@ class DashboardController extends Controller
                 ->groupBy('Degree_Program')
                 ->pluck('count', 'Degree_Program');
 
-            $programBreakdown = collect($validPrograms)->mapWithKeys(fn($p) => [$p => 0]);
+            $programBreakdown = ['BS Computer Science' => 0, 'BS Information Technology' => 0];
             foreach ($rawPrograms as $prog => $count) {
                 $normalized = $programMap[$prog] ?? null;
                 if ($normalized) {
-                    $programBreakdown[$normalized] = ($programBreakdown[$normalized] ?? 0) + $count;
+                    $programBreakdown[$normalized] += (int) $count;
                 }
+                // Unknown programs (BS Cpe, BS IS, etc.) are silently dropped
             }
-            $programBreakdown = $programBreakdown->filter(fn($v) => $v > 0)->sortByDesc(fn($v) => $v);
+            // Remove zeros and sort
+            $programBreakdown = collect($programBreakdown)
+                ->filter(fn($v) => $v > 0)
+                ->sortByDesc(fn($v) => $v);
 
             $yearBreakdown = DB::table('students')
                 ->select('Year_Level', DB::raw('COUNT(*) as count'))
