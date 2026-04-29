@@ -30,15 +30,15 @@ function ExportModal({ students, onClose }) {
         const cleared = clearanceFilter === 'cleared';
         exportStudents = students.filter(s => cleared ? (s.Med_Clearance || s.Medical_Clearance) : (!s.Med_Clearance && !s.Medical_Clearance));
         filterLabel = cleared ? 'Cleared Students' : 'Pending Clearance Students';
-      } else if (exportType === 'sport' || exportType === 'activity' || exportType === 'skill') {
-        // Fetch full student details with related records
-        setLoading(true);
-        const ids = students.map(s => s.Student_ID);
-        // Use comprehensive search endpoint
+        generatePDF(exportStudents, filterLabel);
+      } else if (exportType === 'all') {
+        generatePDF(exportStudents, 'All Students');
+      } else {
+        // Fetch from search API
         let params = {};
         if (exportType === 'sport') {
-          params.skill = sportFilter === 'All Sports' ? '' : sportFilter;
           params.activity_type = 'Sports';
+          params.search = sportFilter === 'All Sports' ? '' : sportFilter;
           filterLabel = sportFilter === 'All Sports' ? 'All Sports Players' : `${sportFilter} Players`;
         } else if (exportType === 'activity') {
           params.activity_type = activityFilter;
@@ -49,11 +49,10 @@ function ExportModal({ students, onClose }) {
         }
         const res = await axios.get(`${API_URL}/search/students`, { params });
         exportStudents = res.data;
+        generatePDF(exportStudents, filterLabel);
       }
-
-      generatePDF(exportStudents, filterLabel);
     } catch (e) {
-      console.error(e);
+      alert('Export failed: ' + (e.message || 'Unknown error'));
     } finally {
       setLoading(false);
       onClose();
@@ -61,6 +60,10 @@ function ExportModal({ students, onClose }) {
   };
 
   const generatePDF = (data, filterLabel) => {
+    if (data.length === 0) {
+      alert(`No students found for: ${filterLabel}`);
+      return;
+    }
     const now = new Date().toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
     const cleared = data.filter(s => s.Med_Clearance || s.Medical_Clearance).length;
 
@@ -85,7 +88,6 @@ function ExportModal({ students, onClose }) {
       *{box-sizing:border-box;margin:0;padding:0}
       body{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#222831;padding:32px}
       .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #F97316}
-      .logo-area{display:flex;align-items:center;gap:12px}
       .school{font-size:13px;font-weight:800;color:#222831}
       .dept{font-size:11px;color:#6b7280}
       .report-title{font-size:18px;font-weight:800;color:#F97316;margin-top:4px}
@@ -102,12 +104,10 @@ function ExportModal({ students, onClose }) {
       @media print{body{padding:16px}}
     </style></head><body>
     <div class="header">
-      <div class="logo-area">
-        <div>
-          <div class="school">Pamantasan ng Cabuyao</div>
-          <div class="dept">College of Computer Studies</div>
-          <div class="report-title">${filterLabel}</div>
-        </div>
+      <div>
+        <div class="school">Pamantasan ng Cabuyao</div>
+        <div class="dept">College of Computer Studies</div>
+        <div class="report-title">${filterLabel}</div>
       </div>
       <div class="meta"><div>Generated: ${now}</div><div>Total: ${data.length} students</div></div>
     </div>
@@ -116,18 +116,27 @@ function ExportModal({ students, onClose }) {
       <div class="stat"><div class="stat-val" style="color:#16a34a">${cleared}</div><div style="font-size:10px;color:#9ca3af;text-transform:uppercase">Cleared</div></div>
       <div class="stat"><div class="stat-val" style="color:#d97706">${data.length-cleared}</div><div style="font-size:10px;color:#9ca3af;text-transform:uppercase">Pending</div></div>
     </div>
-    <div class="filter-tag">📋 Export Filter: ${filterLabel}</div>
+    <div class="filter-tag">Export Filter: ${filterLabel}</div>
     <table>
       <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Program</th><th>Year</th><th>Section</th><th>Email</th><th>Status</th><th>Clearance</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
     <div class="footer">CCS Student Profiling System · Pamantasan ng Cabuyao · Confidential · ${now}</div>
+    <script>window.onload=function(){window.print();}<\/script>
     </body></html>`;
 
-    const win = window.open('', '_blank');
-    win.document.write(html);
-    win.document.close();
-    win.onload = () => win.print();
+    // Use blob URL to avoid popup blocker
+    const blob = new Blob([html], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    const win  = window.open(url, '_blank');
+    if (!win) {
+      // Fallback: download as HTML file
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filterLabel.replace(/\s+/g,'-')}-${new Date().toISOString().slice(0,10)}.html`;
+      a.click();
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
   };
 
   return (
