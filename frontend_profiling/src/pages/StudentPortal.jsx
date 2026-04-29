@@ -196,11 +196,12 @@ function StudentDashboard({ student }) {
       {/* Stats row */}
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:'0.8rem',marginBottom:'1.2rem'}}>
         {[
-          {label:'Academic Records', value: (student.academic_histories||[]).length, color:'#3b82f6'},
-          {label:'Skills', value: (student.skill_repositories||[]).length, color:'#10b981'},
-          {label:'Activities', value: (student.non_academic_histories||[]).length, color:'#F97316'},
-          {label:'Affiliations', value: (student.affiliations||[]).length, color:'#8b5cf6'},
-          {label:'Classmates', value: classmates.length, color:'#ec4899'},
+          {label:'Academic Records', value: (student.academic_histories||[]).length,    color:'#3b82f6'},
+          {label:'Skills',           value: (student.skill_repositories||[]).length,    color:'#10b981'},
+          {label:'Activities',       value: (student.non_academic_histories||[]).length,color:'#F97316'},
+          {label:'Affiliations',     value: (student.affiliations||[]).length,          color:'#8b5cf6'},
+          {label:'Disciplinary',     value: (student.disciplinary_records||[]).length,  color:'#ef4444'},
+          {label:'Classmates',       value: classmates.length,                          color:'#ec4899'},
         ].map(s=>(
           <div key={s.label} style={{background:'white',borderRadius:'12px',padding:'1rem',boxShadow:'0 2px 8px rgba(34,40,49,0.06)',border:'1px solid rgba(0,0,0,0.04)'}}>
             <div style={{fontSize:'1.8em',fontWeight:800,color:s.color,lineHeight:1}}>{s.value}</div>
