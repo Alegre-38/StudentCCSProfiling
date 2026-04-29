@@ -55,15 +55,15 @@ function Login() {
         {/* PnC branding above card */}
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <img
-            src="https://www.pnc.edu.ph/wp-content/uploads/2021/07/PNC-Logo.png"
-            alt="Pamantasan ng Cabuyao"
-            style={{ width: '80px', height: '80px', objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))' }}
+            src="/ccs-logo.png"
+            alt="College of Computer Studies"
+            style={{ width: '100px', height: '100px', objectFit: 'contain', filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.6))' }}
             onError={e => e.target.style.display = 'none'}
           />
-          <div style={{ marginTop: '0.6rem', color: 'white', fontWeight: 800, fontSize: '1em', letterSpacing: '0.01em', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+          <div style={{ marginTop: '0.8rem', color: 'white', fontWeight: 800, fontSize: '1.05em', letterSpacing: '0.01em', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
             Pamantasan ng Cabuyao
           </div>
-          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.78em', marginTop: '2px', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+          <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.8em', marginTop: '3px', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
             College of Computer Studies
           </div>
         </div>
