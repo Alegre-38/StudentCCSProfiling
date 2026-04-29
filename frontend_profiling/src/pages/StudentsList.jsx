@@ -122,6 +122,86 @@ function StudentsList() {
   const programs = [...new Set(students.map(s => s.Degree_Program).filter(p => VALID_PROGRAMS.includes(p)))];
   const paginated = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
 
+  const exportPDF = () => {
+    const now = new Date().toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' });
+    const cleared = filtered.filter(s => s.Med_Clearance || s.Medical_Clearance).length;
+    const pending  = filtered.length - cleared;
+
+    const rows = filtered.map((s, i) => `
+      <tr style="background:${i%2===0?'#fff':'#f9fafb'}">
+        <td>${i+1}</td>
+        <td style="font-family:monospace;font-size:11px;color:#6b7280">${s.Student_ID}</td>
+        <td><strong>${s.Last_Name}, ${s.First_Name}</strong></td>
+        <td>${s.Degree_Program || '—'}</td>
+        <td>Year ${s.Year_Level}</td>
+        <td>${s.Section || '—'}</td>
+        <td>${s.Email || s.Email_Address || '—'}</td>
+        <td>${s.Enrollment_Status || '—'}</td>
+        <td style="color:${(s.Med_Clearance||s.Medical_Clearance)?'#16a34a':'#d97706'};font-weight:700">
+          ${(s.Med_Clearance||s.Medical_Clearance)?'Cleared':'Pending'}
+        </td>
+      </tr>`).join('');
+
+    const filterDesc = [
+      filterProgram && `Program: ${filterProgram}`,
+      filterYear    && `Year: ${filterYear}`,
+      filterClearance && `Clearance: ${filterClearance}`,
+      search        && `Search: "${search}"`,
+    ].filter(Boolean).join(' · ') || 'All Students';
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Student Information Report</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; color: #222831; padding: 32px; }
+      .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 3px solid #F97316; }
+      .title { font-size: 22px; font-weight: 800; color: #222831; }
+      .subtitle { font-size: 12px; color: #6b7280; margin-top: 4px; }
+      .meta { text-align: right; font-size: 11px; color: #9ca3af; }
+      .stats { display: flex; gap: 16px; margin-bottom: 20px; }
+      .stat { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 16px; }
+      .stat-val { font-size: 20px; font-weight: 800; }
+      .stat-lbl { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
+      .filter-bar { background: #fff8f0; border: 1px solid #fed7aa; border-radius: 6px; padding: 8px 12px; margin-bottom: 16px; font-size: 11px; color: #92400e; }
+      table { width: 100%; border-collapse: collapse; font-size: 11px; }
+      thead tr { background: #222831; color: white; }
+      th { padding: 8px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+      td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+      .footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 10px; color: #9ca3af; text-align: center; }
+      @media print { body { padding: 16px; } }
+    </style></head><body>
+    <div class="header">
+      <div>
+        <div class="title">Profiling System</div>
+        <div class="subtitle">Student Information Report</div>
+      </div>
+      <div class="meta">
+        <div>Generated: ${now}</div>
+        <div>Total Records: ${filtered.length}</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-val" style="color:#F97316">${filtered.length}</div><div class="stat-lbl">Total Students</div></div>
+      <div class="stat"><div class="stat-val" style="color:#16a34a">${cleared}</div><div class="stat-lbl">Cleared</div></div>
+      <div class="stat"><div class="stat-val" style="color:#d97706">${pending}</div><div class="stat-lbl">Pending</div></div>
+    </div>
+    <div class="filter-bar">Filter: ${filterDesc}</div>
+    <table>
+      <thead><tr>
+        <th>#</th><th>Student ID</th><th>Name</th><th>Program</th>
+        <th>Year</th><th>Section</th><th>Email</th><th>Status</th><th>Clearance</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="footer">CCS Student Profiling System · Confidential · ${now}</div>
+    </body></html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    win.onload = () => { win.print(); };
+  };
+
   const inputBase = {
     padding:'0.55rem 0.9rem', borderRadius:'8px', border:'1px solid #e5e7eb',
     fontSize:'0.88em', color:'#222831', outline:'none', background:'white',
@@ -138,7 +218,16 @@ function StudentsList() {
           <h1 className="page-title">Student Information</h1>
           <p className="page-subtitle">Manage and view detailed profiles of all enrolled students.</p>
         </div>
-
+        <button onClick={exportPDF} disabled={filtered.length === 0}
+          style={{display:'flex',alignItems:'center',gap:'0.5rem',padding:'0.65rem 1.3rem',borderRadius:'9px',border:'1px solid rgba(249,115,22,0.3)',background:'rgba(249,115,22,0.06)',color:'#F97316',fontWeight:700,fontSize:'0.85em',cursor:filtered.length===0?'not-allowed':'pointer',transition:'all 0.2s',opacity:filtered.length===0?0.5:1}}
+          onMouseEnter={e=>{if(filtered.length>0){e.currentTarget.style.background='#F97316';e.currentTarget.style.color='white';}}}
+          onMouseLeave={e=>{e.currentTarget.style.background='rgba(249,115,22,0.06)';e.currentTarget.style.color='#F97316';}}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+          Export PDF ({filtered.length})
+        </button>
       </div>
 
       {/* Search & Filter Bar */}
